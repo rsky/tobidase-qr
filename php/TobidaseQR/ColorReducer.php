@@ -144,7 +144,7 @@ class ColorReducer
     {
         $median = (max($histgram) + min($histgram)) / 2;
 
-        sort($histgram, SORT_NUMERIC);
+        arsort($histgram, SORT_NUMERIC);
 
         $topColors = [];
         foreach ($histgram as $code => $frequency) {
