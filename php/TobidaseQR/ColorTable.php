@@ -64,9 +64,9 @@ class ColorTable
     /**
      * L*a*b*近似色判定で使うL*成分の重み係数
      *
-     * @const float
+     * @var float
      */
-    const BLIGHTNESS_WEIGHT = 1.2;
+    private $blightnessWeight = 1.0;
 
     /**
      * 内部テーブルが連想配列かどうか
@@ -333,6 +333,18 @@ class ColorTable
     }
 
     /**
+     * L*a*b*近似色判定でのL*成分の重みをセットする
+     *
+     * @param float $weight
+     *
+     * @return void
+     */
+    public function setBlightnessWeight($weight)
+    {
+        $this->blightnessWeight = $weight;
+    }
+
+    /**
      * 与えられたRGB値に最も近いカラーコードを返す
      *
      * @param int $r
@@ -386,7 +398,7 @@ class ColorTable
 
         foreach ($this->labColorTable as $i => $lab) {
             list($tL, $ta, $tb) = $lab;
-            $d  = ($tL - $L) * ($tL - $L) * self::BLIGHTNESS_WEIGHT
+            $d  = ($tL - $L) * ($tL - $L) * $this->blightnessWeight
                 + ($ta - $a) * ($ta - $a)
                 + ($tb - $b) * ($tb - $b);
             if ($d < $distance) {
@@ -433,30 +445,30 @@ class ColorTable
      * Imagickオブジェクトから近似色のヒストグラムを作成する
      *
      * @param Imagick $imagick 色空間は COLORSPACE_RGB or COLORSPACE_SRGB
+     * @param bool $useLabDistance
      *
      * @return array
      */
-    public function createHistgram(Imagick $imagick)
+    public function createHistgram(Imagick $imagick, $useLabDistance = false)
     {
         $histgram = array_fill(self::COLORCODE_MIN, self::COLORCODE_MAX, 0);
 
         $width = $imagick->getImageWidth();
         $height = $imagick->getImageHeight();
 
+        $method = ($useLabDistance)
+            ? 'nearestColorCodeByRgbUsingLabDistance'
+            : 'nearestColorCodeByRgb';
+
         for ($y = 0; $y < $height; $y++) {
             for ($x = 0; $x < $width; $x++) {
                 $px = $imagick->getImagePixelColor($x, $y)->getColor();
-                $code = $this->nearestColorCodeByRgbUsingLabDistance(
-                    $px['r'], $px['g'], $px['b']
-                );
+                $code = $this->$method($px['r'], $px['g'], $px['b']);
                 $histgram[$code]++;
             }
         }
 
-        $histgram = array_filter($histgram);
-        arsort($histgram, SORT_NUMERIC);
-
-        return $histgram;
+        return array_filter($histgram);
     }
 }
 
