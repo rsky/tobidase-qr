@@ -100,7 +100,7 @@ class ColorReducer
         // メディアンカット法で必要な数まで分割する
         $colors = [];
         foreach ($remains as $code) {
-            $colors[$code] = new ColorRangeElement(
+            $colors[$code] = new Color(
                 $code, $this->table[$code], $histgram[$code]
             );
         }

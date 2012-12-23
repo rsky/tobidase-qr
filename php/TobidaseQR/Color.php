@@ -36,9 +36,9 @@
 namespace TobidaseQR;
 
 /**
- * 色範囲の各要素クラス
+ * 色情報クラス
  */
-class ColorRangeElement
+class Color
 {
     /**
      * カラーコード

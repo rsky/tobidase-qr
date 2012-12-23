@@ -65,14 +65,14 @@ class ColorRange
     /**
      * 内包する色
      *
-     * @param ColorRangeElement[]
+     * @param TobidaseQR\Color[]
      */
     private $colors;
 
     /**
      * コンストラクタ
      *
-     * @param ColorRangeElement[] $colors
+     * @param TobidaseQR\Color[] $colors
      */
     public function __construct(array $colors)
     {
@@ -182,7 +182,7 @@ class ColorRange
      *
      * @param void
      *
-     * @return TobidaseQR\ColorRangeElement
+     * @return TobidaseQR\Color
      */
     public function getMostSignificantColor()
     {

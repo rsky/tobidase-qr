@@ -37,9 +37,9 @@ namespace TobidaseQR;
 
 use Imagick, ImagickException;
 
+require __DIR__ . '/TobidaseQR/Color.php';
 require __DIR__ . '/TobidaseQR/ColorTable.php';
 require __DIR__ . '/TobidaseQR/ColorRange.php';
-require __DIR__ . '/TobidaseQR/ColorRangeElement.php';
 require __DIR__ . '/TobidaseQR/ColorReducer.php';
 
 const WIDTH = 32;
