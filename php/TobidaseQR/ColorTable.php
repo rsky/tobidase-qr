@@ -241,11 +241,14 @@ class ColorTable
      */
     public function getRgbColorTable()
     {
+        if ($this->associative) {
+            return $this->rgbColorTable;
+        }
+
         $table = [];
 
         foreach ($this->rgbColorTable as $index => $rgb) {
-            $code = ($this->associative) ? $index : $index + 1;
-            $table[$code] = $rgb;
+            $table[$index + 1] = $rgb;
         }
 
         return $table;
@@ -260,11 +263,14 @@ class ColorTable
      */
     public function getLabColorTable()
     {
+        if ($this->associative) {
+            return $this->labColorTable;
+        }
+
         $table = [];
 
         foreach ($this->labColorTable as $index => $lab) {
-            $code = ($this->associative) ? $index : $index + 1;
-            $table[$code] = $lab;
+            $table[$index + 1] = $lab;
         }
 
         return $table;
@@ -357,7 +363,7 @@ class ColorTable
      */
     public function nearestColorCodeByRgb($r, $g, $b)
     {
-        $distance = 16777216.0;
+        $distance = 16777216;
         $index = -1;
 
         foreach ($this->rgbColorTable as $i => $rgb) {
