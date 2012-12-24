@@ -33,33 +33,29 @@
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  */
 
-namespace TobidaseQR;
+namespace TobidaseQR\Color;
 
+use TobidaseQR\Color;
+use TobidaseQR\Color\Mapper;
 use Imagick;
 use InvalidArgumentException;
 use OutOfRangeException;
 use UnexpectedValueException;
 
-require_once __DIR__ . '/../utility.php';
-
 /**
  * カラーテーブルクラス
  */
-class ColorTable
+class Table
 {
     /**
      * カラーコードの最小値
-     *
-     * @const int
      */
-    const COLORCODE_MIN = 1;
+    const COLORCODE_MIN = 0;
 
     /**
      * カラーコードの最大値
-     *
-     * @const int
      */
-    const COLORCODE_MAX = 159;
+    const COLORCODE_MAX = 158;
 
     /**
      * L*a*b*近似色判定で使うL*成分の重み係数
@@ -67,13 +63,6 @@ class ColorTable
      * @var float
      */
     private $blightnessWeight = 1.0;
-
-    /**
-     * 内部テーブルが連想配列かどうか
-     *
-     * @const bool
-     */
-    private $associative = false;
 
     /**
      * マイデザインのカラーパレットとRGB値の対応表
@@ -221,13 +210,12 @@ class ColorTable
     public function __construct(array $rgbTable = null)
     {
         if ($rgbTable) {
-            $this->associative = true;
             $this->rgbColorTable = $rgbTable;
             $this->labColorTable = [];
 
             foreach ($rgbTable as $code => $rgb) {
                 list($r, $g, $b) = $rgb;
-                $this->labColorTable[$code] = rgbToLab($r, $g, $b);
+                $this->labColorTable[$code] = Color::rgbToLab($r, $g, $b);
             }
         }
     }
@@ -241,17 +229,7 @@ class ColorTable
      */
     public function getRgbColorTable()
     {
-        if ($this->associative) {
-            return $this->rgbColorTable;
-        }
-
-        $table = [];
-
-        foreach ($this->rgbColorTable as $index => $rgb) {
-            $table[$index + 1] = $rgb;
-        }
-
-        return $table;
+        return $this->rgbColorTable;
     }
 
     /**
@@ -263,17 +241,7 @@ class ColorTable
      */
     public function getLabColorTable()
     {
-        if ($this->associative) {
-            return $this->labColorTable;
-        }
-
-        $table = [];
-
-        foreach ($this->labColorTable as $index => $lab) {
-            $table[$index + 1] = $lab;
-        }
-
-        return $table;
+        return $this->labColorTable;
     }
 
     /**
@@ -298,12 +266,9 @@ class ColorTable
             ));
         }
 
-        $index = ($this->associative) ? $code : $code - 1;
-        if (!isset($this->rgbColorTable[$index])) {
+        if (!isset($this->rgbColorTable[$code])) {
             throw new DomainException("Color code {$code} is not available");
         }
-
-        return $index;
     }
 
     /**
@@ -317,9 +282,9 @@ class ColorTable
      */
     public function getRgbColor($code)
     {
-        $index = $this->checkColorCode($code);
+        $this->checkColorCode($code);
 
-        return $this->rgbColorTable[$index];
+        return $this->rgbColorTable[$code];
     }
 
     /**
@@ -333,9 +298,9 @@ class ColorTable
      */
     public function getLabColor($code)
     {
-        $index = $this->checkColorCode($code);
+        $this->checkColorCode($code);
 
-        return $this->labColorTable[$index];
+        return $this->labColorTable[$code];
     }
 
     /**
@@ -364,7 +329,7 @@ class ColorTable
     public function nearestColorCodeByRgb($r, $g, $b)
     {
         $distance = 16777216;
-        $index = -1;
+        $code = -1;
 
         foreach ($this->rgbColorTable as $i => $rgb) {
             list($tr, $tg, $tb) = $rgb;
@@ -373,17 +338,17 @@ class ColorTable
                 + ($tb - $b) * ($tb - $b);
             if ($d < $distance) {
                 $distance = $d;
-                $index = $i;
+                $code = $i;
             }
         }
 
-        if ($index === -1) {
+        if ($code === -1) {
             throw new UnexpectedValueException(
                 'Unexpected RGB value was given'
             );
         }
 
-        return ($this->associative) ? $index : $index + 1;
+        return $code;
     }
 
     /**
@@ -400,7 +365,7 @@ class ColorTable
     public function nearestColorCodeByLab($L, $a, $b)
     {
         $distance = 16777216.0;
-        $index = -1;
+        $code = -1;
 
         foreach ($this->labColorTable as $i => $lab) {
             list($tL, $ta, $tb) = $lab;
@@ -409,17 +374,17 @@ class ColorTable
                 + ($tb - $b) * ($tb - $b);
             if ($d < $distance) {
                 $distance = $d;
-                $index = $i;
+                $code = $i;
             }
         }
 
-        if ($index === -1) {
+        if ($code === -1) {
             throw new UnexpectedValueException(
                 'Unexpected L*a*b* value was given'
             );
         }
 
-        return ($this->associative) ? $index : $index + 1;
+        return $code;
     }
 
     /**
@@ -436,7 +401,7 @@ class ColorTable
      */
     public function nearestColorCodeByRgbUsingLabDistance($r, $g, $b)
     {
-        list($L, $A, $B) = rgbToLab($r, $g, $b);
+        list($L, $A, $B) = Color::rgbToLab($r, $g, $b);
 
         try {
             return $this->nearestColorCodeByLab($L, $A, $B);
@@ -450,31 +415,29 @@ class ColorTable
     /**
      * Imagickオブジェクトから近似色のヒストグラムを作成する
      *
-     * @param Imagick $imagick 色空間は COLORSPACE_RGB or COLORSPACE_SRGB
-     * @param bool $useLabDistance
+     * @param Imagick $image 色空間は COLORSPACE_RGB or COLORSPACE_SRGB
+     * @param array $options
      *
      * @return array
      */
-    public function createHistgram(Imagick $imagick, $useLabDistance = false)
+    public function createHistgram(Imagick $image, array $options = [])
     {
-        $histgram = array_fill(self::COLORCODE_MIN, self::COLORCODE_MAX, 0);
+        $colorNum = self::COLORCODE_MAX - self::COLORCODE_MIN + 1;
+        $histgram = array_fill(self::COLORCODE_MIN, $colorNum, 0);
 
-        $width = $imagick->getImageWidth();
-        $height = $imagick->getImageHeight();
+        if (!empty($options[Mapper::OPTION_DITHERING])) {
+            $mapper = new Mapper\DitheringMapper;
+        } else {
+            $mapper = new Mapper\SimpleMapper;
+        }
 
-        $method = ($useLabDistance)
-            ? 'nearestColorCodeByRgbUsingLabDistance'
-            : 'nearestColorCodeByRgb';
-
-        for ($y = 0; $y < $height; $y++) {
-            for ($x = 0; $x < $width; $x++) {
-                $px = $imagick->getImagePixelColor($x, $y)->getColor();
-                $code = $this->$method($px['r'], $px['g'], $px['b']);
+        foreach ($mapper->map($image, $this, $options) as $row) {
+            foreach ($row as $code) {
                 $histgram[$code]++;
             }
         }
 
-        return array_filter($histgram);
+        return $histgram;
     }
 }
 

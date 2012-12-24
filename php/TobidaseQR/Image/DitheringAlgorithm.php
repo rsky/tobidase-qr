@@ -3,7 +3,7 @@
  * PHP version 5.4
  *
  * とびだせ どうぶつの森™ マイデザインQRコードジェネレータ
- * 色範囲の各要素クラス
+ * 入力画像をディザリングするインターフェイス
  *
  * 「とびだせ どうぶつの森」は任天堂株式会社の登録商標です
  *
@@ -33,83 +33,32 @@
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  */
 
-namespace TobidaseQR;
+namespace TobidaseQR\Image;
 
-if (!function_exists('TobidaseQR\\rgbToLab')) {
-    require __DIR__ . '/../utility.php';
-}
+use TobidaseQR\Color\Table;
+use Imagick;
 
 /**
- * 色情報クラス
+ * 入力画像をディザリングするインターフェイス
  */
-class Color
+interface DitheringAlgorithm
 {
-    /**
-     * カラーコード
-     *
-     * @var int
-     */
-    public $code;
-
-    /**
-     * 各チャンネルの値
-     *
-     * @var int
-     */
-    public $r;
-    public $g;
-    public $b;
-
-    /**
-     * 元画像での出現頻度
-     *
-     * @var int
-     */
-    public $frequency;
-
-    /**
-     * 比較用の値
-     *
-     * @var int
-     */
-    public $cmpValue;
-
     /**
      * コンストラクタ
      *
-     * @param int $code
-     * @param array $rgb
-     * @param int $frequency
+     * @param TobidaseQR\Color\Table $table
+     * @param array $options
      */
-    public function __construct($code, array $rgb, $frequency = 0)
-    {
-        list($r, $g, $b) = $rgb;
-        $this->code = $code;
-        $this->r = $r;
-        $this->g = $g;
-        $this->b = $b;
-        $this->frequency = $frequency;
-        $this->cmpValue = ($g << 16) | ($r << 8) | $b;
-    }
+    public function __construct(Table $table, array $options = []);
 
     /**
-     * CIE RGB表色系をCIE L*a*b*表色系に変換する
+     * 画像にディザリングを適用する
      *
-     * RGBの色空間はsRGBで光源はD65、
-     * L*a*b*の光源はD50として変換を行う
+     * @param Imagick $image
      *
-     * @param int $r 赤色成分 [0..255]
-     * @param int $g 緑色成分 [0..255]
-     * @param int $b 青色成分 [0..255]
-     *
-     * @return float[] ($L, $a, $b)
-     *
-     * @see TobidaseQR\rgbToLab()
+     * @return int[][] カラーコードの2次元配列
      */
-    public static function rgbToLab($r, $g, $b)
-    {
-        return rgbToLab($r, $g, $b);
-    }
+    public function apply(Imagick $image);
 }
 
 /*

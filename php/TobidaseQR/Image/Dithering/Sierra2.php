@@ -3,7 +3,7 @@
  * PHP version 5.4
  *
  * とびだせ どうぶつの森™ マイデザインQRコードジェネレータ
- * 色範囲の各要素クラス
+ * Sierra2 (Two-row Sierra) 法によるディザリングを行うクラス
  *
  * 「とびだせ どうぶつの森」は任天堂株式会社の登録商標です
  *
@@ -33,82 +33,39 @@
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  */
 
-namespace TobidaseQR;
-
-if (!function_exists('TobidaseQR\\rgbToLab')) {
-    require __DIR__ . '/../utility.php';
-}
+namespace TobidaseQR\Image\Dithering;
 
 /**
- * 色情報クラス
+ * Sierra2 (Two-row Sierra) 法によるディザリングを行うクラス
  */
-class Color
+class Sierra2 extends ErrorDiffusionDithering
 {
     /**
-     * カラーコード
+     * 内部状態を初期化する
      *
-     * @var int
-     */
-    public $code;
-
-    /**
-     * 各チャンネルの値
+     * @param int $width
+     * @param int $height
      *
-     * @var int
+     * @return void
      */
-    public $r;
-    public $g;
-    public $b;
-
-    /**
-     * 元画像での出現頻度
-     *
-     * @var int
-     */
-    public $frequency;
-
-    /**
-     * 比較用の値
-     *
-     * @var int
-     */
-    public $cmpValue;
-
-    /**
-     * コンストラクタ
-     *
-     * @param int $code
-     * @param array $rgb
-     * @param int $frequency
-     */
-    public function __construct($code, array $rgb, $frequency = 0)
+    protected function init($width, $height)
     {
-        list($r, $g, $b) = $rgb;
-        $this->code = $code;
-        $this->r = $r;
-        $this->g = $g;
-        $this->b = $b;
-        $this->frequency = $frequency;
-        $this->cmpValue = ($g << 16) | ($r << 8) | $b;
-    }
+        $errorRow = array_fill(0, $width + 2, [0.0, 0.0, 0.0]);
+        $errorRow[-1] = [0.0, 0.0, 0.0];
+        $errorRow[-2] = [0.0, 0.0, 0.0];
+        $this->errorTable = array_fill(0, $height + 1, $errorRow);
 
-    /**
-     * CIE RGB表色系をCIE L*a*b*表色系に変換する
-     *
-     * RGBの色空間はsRGBで光源はD65、
-     * L*a*b*の光源はD50として変換を行う
-     *
-     * @param int $r 赤色成分 [0..255]
-     * @param int $g 緑色成分 [0..255]
-     * @param int $b 青色成分 [0..255]
-     *
-     * @return float[] ($L, $a, $b)
-     *
-     * @see TobidaseQR\rgbToLab()
-     */
-    public static function rgbToLab($r, $g, $b)
-    {
-        return rgbToLab($r, $g, $b);
+        $offsets = [
+            /***********************/ [1, 0], [2, 0],
+            [-2, 1], [-1, 1], [0, 1], [1, 1], [2, 1],
+        ];
+
+        $factors = [
+            /******/ 4, 3,
+            1, 2, 3, 2, 1,
+        ];
+
+        $this->params = $this->makeParams($offsets, $factors);
     }
 }
 

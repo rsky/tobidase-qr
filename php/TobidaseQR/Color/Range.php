@@ -33,12 +33,12 @@
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  */
 
-namespace TobidaseQR;
+namespace TobidaseQR\Color;
 
 /**
  * 色範囲クラス
  */
-class ColorRange
+class Range
 {
     /**
      * 各チャンネルの最大値/最小値/差分
@@ -134,7 +134,7 @@ class ColorRange
      *
      * @param void
      *
-     * @return TobidaseQR\ColorRange[]
+     * @return TobidaseQR\Color\Range[]
      */
     public function splitByMedian()
     {
@@ -174,7 +174,7 @@ class ColorRange
             throw new RuntimeException('Lower range is empty');
         }
 
-        return [new ColorRange($uppers), new ColorRange($lowers)];
+        return [new Range($uppers), new Range($lowers)];
     }
 
     /**

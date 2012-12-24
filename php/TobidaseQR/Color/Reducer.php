@@ -33,19 +33,40 @@
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  */
 
-namespace TobidaseQR;
+namespace TobidaseQR\Color;
+
+use TobidaseQR\Color;
+use UnexpectedValueException;
 
 /**
  * 減色処理クラス
  */
-class ColorReducer
+class Reducer
 {
     /**
-     * 減色する色数
-     *
-     * @const int
+     * オプションキー
      */
-    const DEFAULT_TARGET_COLOR_COUNT = 15;
+    const OPTION_PALETTE_COUNT  = 'paletteCount';
+    const OPTION_KEY_COLOR      = 'keyColor';
+
+    /**
+     * パレット色数の既定値
+     */
+    const DEFAULT_PALETTE_COUNT = 15;
+
+    /**
+     * パレット色数
+     *
+     * @var int
+     */
+    private $paletteCount;
+
+    /**
+     * 必ずパレットに含める色番号
+     *
+     * @var int
+     */
+    private $keyColor;
 
     /**
      * カラーテーブル
@@ -57,7 +78,7 @@ class ColorReducer
     /**
      * 色範囲のリスト
      *
-     * @var TobidaseQR\ColorRange[]
+     * @var TobidaseQR\Color\Range[]
      */
     private $ranges;
 
@@ -65,38 +86,88 @@ class ColorReducer
      * コンストラクタ
      *
      * @param array $rgbTable
+     * @param array $options
      */
-    public function __construct(array $rgbTable = null)
+    public function __construct(array $rgbTable = null, array $options = [])
     {
         if ($rgbTable) {
             $this->table = $rgbTable;
         } else {
-            $this->table = (new ColorTable)->getRgbColorTable();
+            $this->table = (new Table)->getRgbColorTable();
         }
+
+        $this->parseOptions($options);
+    }
+
+    /**
+     * 減色オプションを解析する
+     *
+     * @param void
+     *
+     * @return void
+     *
+     * @throws UnexpectedValueException
+     */
+    protected function parseOptions(array $options)
+    {
+        $paletteCount = self::DEFAULT_PALETTE_COUNT;
+        if (array_key_exists(self::OPTION_PALETTE_COUNT, $options)) {
+            $paletteCount = (int)$options[self::OPTION_PALETTE_COUNT];
+            if ($paletteCount < 1) {
+                throw new UnexpectedValueException(
+                    'paletteCount must be a positive integer'
+                );
+            }
+        }
+        $this->paletteCount = $paletteCount;
+
+        $keyColor = -1;
+        if (array_key_exists(self::OPTION_KEY_COLOR, $options)) {
+            $keyColor = (int)$options[self::OPTION_KEY_COLOR];
+            if (!array_key_exists($keyColor, $this->table)) {
+                throw new UnexpectedValueException(
+                    'specified keyColor is not available'
+                );
+            }
+        }
+        $this->keyColor = $keyColor;
     }
 
     /**
      * ヒストグラムを元に減色処理を行ったカラーテーブルを返す
      *
      * @param array $histgram
-     * @param int $count
      *
      * @return array
      */
-    public function reduceColor(
-        array $histgram,
-        $count = self::DEFAULT_TARGET_COLOR_COUNT
-    ) {
-        if (count($histgram) <= $count) {
-            return $this->createReducedColorTable(array_keys($histgram));
+    public function reduceColor(array $histgram)
+    {
+        $paletteCount = $this->paletteCount;
+        $keyColor = $this->keyColor;
+        $histgram = array_filter($histgram);
+        arsort($histgram, SORT_NUMERIC);
+
+        // STAGE 0: 減色の必要がなければそのまま存在する色だけを使う
+        if ($keyColor !== -1) {
+            unset($histgram[$keyColor]);
+            $palette = array_keys($histgram);
+            array_unshift($palette, $keyColor);
+        } else {
+            $palette = array_keys($histgram);
+        }
+        if (count($palette) <= $paletteCount) {
+            return $this->createReducedColorTable($palette);
         }
 
-        // STAGE 1: 最もよく使われる色をパレットに抽出する
-        $palette = $this->filterTopColors($histgram, floor($count / 2));
+        // STAGE 1: 最もよく使われる色を抽出する
+        $palette = $this->filterTopColors($histgram);
         $remains = array_slice(array_keys($histgram), count($palette));
-        $splitLimit = $count - count($palette);
+        if ($keyColor !== -1) {
+            array_unshift($palette, $keyColor);
+        }
+        $splitLimit = $paletteCount - count($palette);
 
-        // STAGE 2: 残りの色から作成した範囲オブジェクトを
+        // STAGE 2: 残りの色から作成した範囲オブジェクトのリストを
         // メディアンカット法で必要な数まで分割する
         $colors = [];
         foreach ($remains as $code) {
@@ -105,13 +176,13 @@ class ColorReducer
             );
         }
 
-        $this->ranges = [new ColorRange($colors)];
+        $this->ranges = [new Range($colors)];
         while (count($this->ranges) < $splitLimit && $this->canSplitRange()) {
             $this->splitRange();
         }
 
-        // STAGE 3: 各範囲から最も出現頻度の高い色を抽出し、それらを
-        // 出現頻度でソートしてからカラーコードをパレットに追加する
+        // STAGE 3: 各範囲から最も出現頻度の高い色を抽出し
+        // それらのカラーコードをパレットに追加する
         $colors = [];
         foreach ($this->ranges as $range) {
             $colors[] = $range->getMostSignificantColor();
@@ -135,22 +206,23 @@ class ColorReducer
     /**
      * ヒストグラムから中央値を超える値のカラーコードを抽出する
      *
-     * @param array $histgram
-     * @param int $limit
+     * @param array $histgram 出現頻度でソート済のヒストグラム
      *
      * @return int[]
      */
-    public function filterTopColors(array $histgram, $limit = -1)
+    protected function filterTopColors(array $histgram)
     {
+        $limit = max(1, (int)($this->paletteCount / 2));
         $median = (max($histgram) + min($histgram)) / 2;
 
-        arsort($histgram, SORT_NUMERIC);
-
         $topColors = [];
+        $count = 0;
+
         foreach ($histgram as $code => $frequency) {
             if ($frequency > $median) {
                 $topColors[] = $code;
-                if ($limit > 0 && count($topColors) > $limit) {
+                $count++;
+                if ($count === $limit) {
                     break;
                 }
             } else {
@@ -213,7 +285,7 @@ class ColorReducer
      *
      * @param int[] $palette
      *
-     * @return TobidaseQR\ColorTable
+     * @return TobidaseQR\Color\Table
      */
     public function createReducedColorTable(array $palette)
     {
@@ -223,7 +295,7 @@ class ColorReducer
             $reducedTable[$code] = $this->table[$code];
         }
 
-        return new ColorTable($reducedTable);
+        return new Table($reducedTable);
     }
 }
 

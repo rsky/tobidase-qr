@@ -37,10 +37,7 @@ namespace TobidaseQR;
 
 use Imagick, ImagickException;
 
-require __DIR__ . '/TobidaseQR/Color.php';
-require __DIR__ . '/TobidaseQR/ColorTable.php';
-require __DIR__ . '/TobidaseQR/ColorRange.php';
-require __DIR__ . '/TobidaseQR/ColorReducer.php';
+spl_autoload_register();
 
 const WIDTH = 32;
 const HEIGHT = 32;
@@ -78,8 +75,8 @@ if ($width > $height) {
 
 $im->resizeImage(WIDTH, HEIGHT, Imagick::FILTER_LANCZOS, 1.0, true);
 
-$table = new ColorTable;
-$reducer = new ColorReducer($table->getRgbColorTable());
+$table = new Color\Table;
+$reducer = new Color\Reducer($table->getRgbColorTable());
 $histgram = $table->createHistgram($im);
 $reducedTable = $reducer->reduceColor($histgram);
 
@@ -91,11 +88,11 @@ foreach ($reducedTable->getRgbColorTable() as $i => $rgb) {
 }
 for ($y = 0; $y < HEIGHT; $y++) {
     for ($x = 0; $x < WIDTH; $x++) {
-        $px = $im->getImagePixelColor($x, $y)->getColor();
+        $pc = $im->getImagePixelColor($x, $y)->getColor();
         $dx = $x * MAGNIFY;
         $dy = $y * MAGNIFY;
         $c = $gdPalatte[$reducedTable->nearestColorCodeByRgbUsingLabDistance(
-            $px['r'], $px['g'], $px['b']
+            $pc['r'], $pc['g'], $pc['b']
         )];
         imagefilledrectangle($gd, $dx, $dy, $dx + MAGNIFY, $dy + MAGNIFY, $c);
     }
