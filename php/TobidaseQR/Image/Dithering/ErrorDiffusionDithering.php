@@ -53,7 +53,7 @@ abstract class ErrorDiffusionDithering implements DitheringAlgorithm
     /**
      * 誤差拡散係数に掛ける重みのデフォルト値
      *
-     * サイズが小さい画像にFloyd-Steinberg法の係数を
+     * サイズが小さい画像に誤差拡散法の係数を
      * そのまま使うと良い結果が得られないので補正する
      */
     const DEFAULT_DIFFUSION_WEIGHT = 0.25;
