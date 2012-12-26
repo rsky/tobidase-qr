@@ -84,6 +84,8 @@ class DitheringMapper implements Mapper
      * @param array $options
      *
      * @return int[][] カラーコードの2次元配列
+     *
+     * @throws UnexpectedValueException
      */
     public function map(Imagick $image, Table $table, array $options = [])
     {
@@ -92,7 +94,7 @@ class DitheringMapper implements Mapper
             : self::ALGO_DEFAULT;
 
         if (!class_exists($algorithm)
-            && !is_a($algorithm, 'TobidaseQR\\Image\\DitheringAlgorithm', true)
+            || !is_a($algorithm, 'TobidaseQR\\Image\\DitheringAlgorithm', true)
         ) {
             throw UnexpectedValueException(
                 "{$algorithm} is not a kind of DitheringAlgorithm"
