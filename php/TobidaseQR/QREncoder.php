@@ -142,6 +142,7 @@ class QREncoder
                 } else {
                     $value = $ipalette[$code];
                 }
+                $offset++;
             }
         }
 

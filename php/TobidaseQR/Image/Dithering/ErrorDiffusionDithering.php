@@ -166,15 +166,15 @@ abstract class ErrorDiffusionDithering implements DitheringAlgorithm
 
         if ($this->weaving) {
             for ($y = 0; $y < $height; $y++) {
-                $rows[] = $this->scanLR($width, $y);
-            }
-        } else {
-            for ($y = 0; $y < $height; $y++) {
                 if ($y % 2) {
                     $rows[] = $this->scanRL($width, $y);
                 } else {
                     $rows[] = $this->scanLR($width, $y);
                 }
+            }
+        } else {
+            for ($y = 0; $y < $height; $y++) {
+                $rows[] = $this->scanLR($width, $y);
             }
         }
 
@@ -243,11 +243,6 @@ abstract class ErrorDiffusionDithering implements DitheringAlgorithm
         $palette = $table->getRgbColorTable();
         $row = [];
 
-        list($pr, $pb, $pg) = $palette[$code];
-        $dr = $pc['r'] - $pr;
-        $dg = $pc['g'] - $pg;
-        $db = $pc['b'] - $pb;
-
         for ($z = $width; $z > 0; $z--) {
             $x = $z - 1;
             $col = $image->getImagePixelColor($x, $y)->getColor();
@@ -274,7 +269,7 @@ abstract class ErrorDiffusionDithering implements DitheringAlgorithm
             }
         }
 
-        return $row;
+        return array_reverse($row);
     }
 }
 
