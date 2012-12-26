@@ -109,7 +109,7 @@ abstract class ErrorDiffusionDithering implements DitheringAlgorithm
     public function __construct(Table $table, array $options = [])
     {
         $this->colorTable = $table;
-        $this->weaving =  (isset($options[self::OPTION_WEAVING_SCAN]))
+        $this->weaving = (isset($options[self::OPTION_WEAVING_SCAN]))
             ? (bool)$options[self::OPTION_WEAVING_SCAN]
             : true;
         $this->weight = (isset($options[self::OPTION_DIFFUSION_WEIGHT]))
@@ -202,9 +202,9 @@ abstract class ErrorDiffusionDithering implements DitheringAlgorithm
         for ($x = 0; $x < $width; $x++) {
             $col = $image->getImagePixelColor($x, $y)->getColor();
             list($errR, $errG, $errB) = $this->errorTable[$y][$x];
-            $r = (int)round($col['r'] + $errR);
-            $g = (int)round($col['g'] + $errG);
-            $b = (int)round($col['b'] + $errB);
+            $r = (int)($col['r'] + $errR);
+            $g = (int)($col['g'] + $errG);
+            $b = (int)($col['b'] + $errB);
 
             $code = $table->nearestColorCodeByRgb($r, $g, $b);
             $row[] = $code;
@@ -252,9 +252,9 @@ abstract class ErrorDiffusionDithering implements DitheringAlgorithm
             $x = $z - 1;
             $col = $image->getImagePixelColor($x, $y)->getColor();
             list($errR, $errG, $errB) = $this->errorTable[$y][$x];
-            $r = (int)round($col['r'] + $errR);
-            $g = (int)round($col['g'] + $errG);
-            $b = (int)round($col['b'] + $errB);
+            $r = (int)($col['r'] + $errR);
+            $g = (int)($col['g'] + $errG);
+            $b = (int)($col['b'] + $errB);
 
             $code = $table->nearestColorCodeByRgb($r, $g, $b);
             $row[] = $code;
