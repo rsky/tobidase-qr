@@ -3,7 +3,7 @@
  * PHP version 5.4
  *
  * とびだせ どうぶつの森™ マイデザインQRコードジェネレータ
- * 村エンティティクラス
+ * プレイヤーエンティティクラス
  *
  * 「とびだせ どうぶつの森」は任天堂株式会社の登録商標です
  *
@@ -33,16 +33,86 @@
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  */
 
-namespace TobidaseQR;
+namespace TobidaseQR\Entity;
+
+use TobidaseQR\Validator;
 
 /**
- * 村エンティティクラス
+ * プレイヤーエンティティクラス
  */
-class Village
+class Player
 {
-    public $id;
-    public $name;
-    public $number;
+    /**
+     * プレイヤーID (32bit)
+     *
+     * @var int
+     */
+    private $id;
+
+    /**
+     * プレイヤー番号 (0-3)
+     *
+     * @var int
+     */
+    private $number;
+
+    /**
+     * プレイヤー名 (Unicode 1-6文字)
+     *
+     * @var string
+     */
+    private $name;
+
+    /**
+     * コンストラクタ
+     *
+     * @param int $id
+     * @param string $name
+     * @param int $number
+     */
+    public function __construct($id, $name, $number = 0)
+    {
+        (new Validator)->validatePlayerName($name);
+        $this->id = $id;
+        $this->number = $number;
+        $this->name = $name;
+    }
+
+    /**
+     * プレイヤーIDを返す
+     *
+     * @param void
+     *
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * プレイヤー番号を返す
+     *
+     * @param void
+     *
+     * @return string
+     */
+    public function getNumber()
+    {
+        return $this->name;
+    }
+
+    /**
+     * プレイヤー名を返す
+     *
+     * @param void
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
 }
 
 /*

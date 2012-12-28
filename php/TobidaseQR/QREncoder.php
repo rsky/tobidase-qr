@@ -35,6 +35,9 @@
 
 namespace TobidaseQR;
 
+use TobidaseQR\Entity\MyDesign;
+use TobidaseQR\Entity\Player;
+use TobidaseQR\Entity\Village;
 use QRCode;
 
 /**
@@ -42,6 +45,16 @@ use QRCode;
  */
 class QREncoder
 {
+    /**
+     * マジックナンバー定数
+     *
+     * 本当は意味があるかもしれないが、未解析の値を
+     * とりあえずマジックナンバー扱いにしている
+     */
+    const MAGICK_1 = 0x1;
+    const MAGICK_2 = 0x2;
+    const MAGICK_A = 0xa;
+
     /**
      * QRコード作成オプションの既定値
      *
@@ -86,7 +99,13 @@ class QREncoder
         Player $player,
         Village $village
     ) {
-        $data = $this->composeData($myDesign, $player, $village);
+        if ($this->checkStructuredType($myDesign->getType())) {
+            $options['maxnum'] = 4;
+        } else {
+            $options['maxnum'] = 1;
+        }
+
+        $data = $this->makeData($myDesign, $player, $village);
         $qr = new QRCode($this->options);
         $qr->addData($data, QRCode::EM_8BIT);
         $qr->finalize();
@@ -103,25 +122,67 @@ class QREncoder
      *
      * @return string
      */
-    public function composeData(
+    public function makeData(
+        MyDesign $myDesign,
+        Player $player,
+        Village $village
+    ) {
+        $data = $this->makeHeader($myDesign, $player, $village)
+            . $this->makePalette($myDesign)
+            . $this->makeBitmap($myDesign);
+
+        // 連結QRコードを生成するタイプの場合は
+        // バイト数が切りの良い数字になるように
+        // ゼロパディングする
+        if ($this->checkStructuredType($myDesign->getType())) {
+            $data .= pack('V', 0);
+        }
+
+        return $data;
+    }
+
+    /**
+     * QRコードの元となるデータのヘッダ部を組み立てる
+     *
+     * @param MyDesign $myDesign
+     * @param Player $player
+     * @param Village $village
+     *
+     * @return string
+     */
+    public function makeHeader(
         MyDesign $myDesign,
         Player $player,
         Village $village
     ) {
         $dName = $this->encodeString($myDesign->getName());
-        $pName = $this->encodeString($player->name);
-        $vName = $this->encodeString($village->name);
+        $pName = $this->encodeString($player->getName());
+        $vName = $this->encodeString($village->getName());
 
-        $data = pack('a40v', $dName, 0)
-            . pack('va18v', $player->id, $pName, $player->number)
-            . pack('va18v', $village->id, $vName, 0)
-            . pack('CC', 1, 2);
+        return pack('a40v', $dName, 0)
+            . pack('va18v', $player->getId(), $pName, $player->getNumber())
+            . pack('va18v', $village->getId(), $vName, 0)
+            . pack('CC', self::MAGICK_1, self::MAGICK_2);
+    }
 
-        $palette = $myDesign->getPalette();
-        $ipalette = array_flip($palette);
-        $colors = array_fill(0, 15, 0xf);
+    /**
+     * QRコードの元となるデータのパレット部(+α)を組み立てる
+     *
+     * @param MyDesign $myDesign
+     *
+     * @return string
+     */
+    public function makePalette(MyDesign $myDesign)
+    {
+        $colors = [
+            0x0f, 0x1f, 0x2f,
+            0x3f, 0x4f, 0x5f,
+            0x6f, 0x7f, 0x8f,
+            0x9f, 0xaf, 0xbf,
+            0xcf, 0xdf, 0xef,
+        ];
 
-        foreach ($palette as $index => $code) {
+        foreach ($myDesign->getPalette() as $index => $code) {
             if ($code < 144) {
                 $colors[$index] = ((int)($code / 9) << 4) | ($code % 9);
             } else {
@@ -129,24 +190,48 @@ class QREncoder
             }
         }
 
-        array_unshift($colors, 'C15');
-        $data .= call_user_func_array('pack', $colors);
-        $data .= pack('CCCv', 0x31, 10, 9, 0);
-        $body = ['C*'];
-        $offset = 0;
+        // パレットに続く8bit値
+        // 今のところ謎なので仮にxorハッシュを求めてみる
+        $hash = 0x3d;
+        foreach ($colors as $code) {
+            $hash ^= $code;
+        }
+        $colors[] = $hash;
+
+        array_unshift($colors, 'C16');
+
+        return call_user_func_array('pack', $colors)
+            . pack('CCv', self::MAGICK_A, $myDesign->getType(), 0);
+    }
+
+    /**
+     * QRコードの元となるデータのビットマップ部を組み立てる
+     *
+     * @param MyDesign $myDesign
+     *
+     * @return string
+     */
+    public function makeBitmap(MyDesign $myDesign)
+    {
+        $ipalette = array_flip($myDesign->getPalette());
+        $data = '';
 
         foreach ($myDesign->getData() as $row) {
-            foreach ($row as $code) {
-                if ($offset % 2) {
-                    $body[] = $value | ($ipalette[$code] << 4);
-                } else {
-                    $value = $ipalette[$code];
-                }
-                $offset++;
-            }
-        }
+            $pack = ['C*'];
+            $value = 0;
+            $colno = 0;
 
-        $data .= call_user_func_array('pack', $body);
+            foreach ($row as $code) {
+                if ($colno % 2 === 0) {
+                    $value = $ipalette[$code];
+                } else {
+                    $pack[] = $value | ($ipalette[$code] << 4);
+                }
+                $colno++;
+            }
+
+            $data .= call_user_func_array('pack', $pack);
+        }
 
         return $data;
     }
@@ -161,6 +246,25 @@ class QREncoder
     private function encodeString($str)
     {
         return mb_convert_encoding($str, 'UCS-2LE', 'UTF-8');
+    }
+
+    /**
+     * 連結QRコードを生成するタイプか判定する
+     *
+     * @param int $type
+     *
+     * @return bool
+     */
+    private function checkStructuredType($type)
+    {
+        return in_array($type, [
+            MyDesign::TYPE_DRESS_LONG_SLEEEVED,
+            MyDesign::TYPE_DRESS_SHORT_SLEEEVED,
+            MyDesign::TYPE_DRESS_NO_SLEEEVE,
+            MyDesign::TYPE_SHIRT_LONG_SLEEEVED,
+            MyDesign::TYPE_SHIRT_SHORT_SLEEEVED,
+            MyDesign::TYPE_SHIRT_NO_SLEEEVE,
+        ]);
     }
 }
 
