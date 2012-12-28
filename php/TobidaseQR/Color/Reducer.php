@@ -36,7 +36,7 @@
 namespace TobidaseQR\Color;
 
 use TobidaseQR\Color;
-use UnexpectedValueException;
+use InvalidArgumentException;
 
 /**
  * 減色処理クラス
@@ -106,7 +106,7 @@ class Reducer
      *
      * @return void
      *
-     * @throws UnexpectedValueException
+     * @throws InvalidArgumentException
      */
     protected function parseOptions(array $options)
     {
@@ -114,7 +114,7 @@ class Reducer
         if (array_key_exists(self::OPTION_PALETTE_COUNT, $options)) {
             $paletteCount = (int)$options[self::OPTION_PALETTE_COUNT];
             if ($paletteCount < 1) {
-                throw new UnexpectedValueException(
+                throw new InvalidArgumentException(
                     'paletteCount must be a positive integer'
                 );
             }
@@ -125,7 +125,7 @@ class Reducer
         if (array_key_exists(self::OPTION_KEY_COLOR, $options)) {
             $keyColor = (int)$options[self::OPTION_KEY_COLOR];
             if (!array_key_exists($keyColor, $this->table)) {
-                throw new UnexpectedValueException(
+                throw new InvalidArgumentException(
                     'specified keyColor is not available'
                 );
             }

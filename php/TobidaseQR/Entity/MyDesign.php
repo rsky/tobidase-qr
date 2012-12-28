@@ -38,8 +38,7 @@ namespace TobidaseQR\Entity;
 use TobidaseQR\Validator;
 use TobidaseQR\Image\Loader;
 use Imagick;
-use RangeException;
-use UnexpectedValueException;
+use InvalidArgumentException;
 
 /**
  * マイデザインエンティティクラス
@@ -143,7 +142,7 @@ class MyDesign
                 return [64, 64];
         }
 
-        throw new UnexpectedValueException("Unsupported type: {$type}");
+        throw new InvalidArgumentException("Unsupported type: {$type}");
     }
 
     /**
@@ -213,7 +212,7 @@ class MyDesign
      *
      * @return void
      *
-     * @throws UnexpectedValueException, RangeException
+     * @throws InvalidArgumentException
      */
     public function setName($name)
     {

@@ -39,7 +39,7 @@ use TobidaseQR\Color\Table;
 use TobidaseQR\Color\Reducer;
 use TobidaseQR\Color\Mapper;
 use Imagick;
-use UnexpectedValueException;
+use InvalidArgumentException;
 
 /**
  * 画像読み込み・変換クラス
@@ -98,7 +98,7 @@ class Loader
             if (array_key_exists($optKey, $options)) {
                 $optValue = $options[$optKey];
                 if (!is_array($optValue)) {
-                    throw new UnexpectedValueException(
+                    throw new InvalidArgumentException(
                         "\$options['{$optKey}'] must be an array"
                     );
                 }

@@ -39,8 +39,7 @@ use TobidaseQR\Color;
 use TobidaseQR\Color\Mapper;
 use Imagick;
 use InvalidArgumentException;
-use OutOfRangeException;
-use UnexpectedValueException;
+use OutOfBoundsException;
 
 /**
  * カラーテーブルクラス
@@ -251,7 +250,7 @@ class Table
      *
      * @return int
      *
-     * @throws InvalidArgumentException, OutOfRangeException, DomainException
+     * @throws InvalidArgumentException, OutOfBoundsException
      */
     private function checkColorCode($code)
     {
@@ -260,14 +259,14 @@ class Table
         }
 
         if ($code < self::COLORCODE_MIN || self::COLORCODE_MAX < $code) {
-            throw new OutOfRangeException(sprintf(
-                'The given color code (%d) is out of range [%d..%d]',
+            throw new OutOfBoundsException(sprintf(
+                'The given color code (%d) is out of bounds [%d..%d]',
                 $code, self::COLORCODE_MIN, self::COLORCODE_MAX
             ));
         }
 
         if (!isset($this->rgbColorTable[$code])) {
-            throw new DomainException("Color code {$code} is not available");
+            throw new OutOfBoundsException("Color code {$code} is not available");
         }
     }
 
@@ -324,7 +323,7 @@ class Table
      *
      * @return int
      *
-     * @throws UnexpectedValueException
+     * @throws InvalidArgumentException
      */
     public function nearestColorCodeByRgb($r, $g, $b)
     {
@@ -343,7 +342,7 @@ class Table
         }
 
         if ($code === -1) {
-            throw new UnexpectedValueException(
+            throw new InvalidArgumentException(
                 'Unexpected RGB value was given'
             );
         }
@@ -360,7 +359,7 @@ class Table
      *
      * @return int
      *
-     * @throws UnexpectedValueException
+     * @throws InvalidArgumentException
      */
     public function nearestColorCodeByLab($L, $a, $b)
     {
@@ -379,7 +378,7 @@ class Table
         }
 
         if ($code === -1) {
-            throw new UnexpectedValueException(
+            throw new InvalidArgumentException(
                 'Unexpected L*a*b* value was given'
             );
         }
@@ -397,7 +396,7 @@ class Table
      *
      * @return int
      *
-     * @throws UnexpectedValueException
+     * @throws InvalidArgumentException
      */
     public function nearestColorCodeByRgbUsingLabDistance($r, $g, $b)
     {
@@ -405,8 +404,8 @@ class Table
 
         try {
             return $this->nearestColorCodeByLab($L, $A, $B);
-        } catch (UnexpectedValueException $e) {
-            throw new UnexpectedValueException(
+        } catch (InvalidArgumentException $e) {
+            throw new InvalidArgumentException(
                 'Unexpected RGB value was given', $e->getCode(), $e
             );
         }

@@ -38,7 +38,7 @@ namespace TobidaseQR\Color\Mapper;
 use TobidaseQR\Color\Table;
 use TobidaseQR\Color\Mapper;
 use Imagick;
-use UnexpectedValueException;
+use InvalidArgumentException;
 
 /**
  * 入力画像の各ピクセルにカラーコードを割り当てるクラス
@@ -85,7 +85,7 @@ class DitheringMapper implements Mapper
      *
      * @return int[][] カラーコードの2次元配列
      *
-     * @throws UnexpectedValueException
+     * @throws InvalidArgumentException
      */
     public function map(Imagick $image, Table $table, array $options = [])
     {
@@ -96,7 +96,7 @@ class DitheringMapper implements Mapper
         if (!class_exists($algorithm)
             || !is_a($algorithm, 'TobidaseQR\\Image\\DitheringAlgorithm', true)
         ) {
-            throw UnexpectedValueException(
+            throw InvalidArgumentException(
                 "{$algorithm} is not a kind of DitheringAlgorithm"
             );
         }
