@@ -52,13 +52,16 @@ use UnexpectedValueException;
 class QRDecoder
 {
     /**
-     * 全体のデータサイズ定数
+     * データサイズ定数
      */
     const DATA_SIZE_SINGLE  = 620;  // 108 + 512
-    const DATA_SIZE_QUAD    = 2160; // 108 + 512 * 4 + 4
+    const DATA_SIZE_QUAD    = 2160; // 108 + 2048 + 4
+    const HEADER_SIZE       = 108;
+    const BODY_SIZE_SINGLE  = 512;  // 32 / 2 * 32
+    const BODY_SIZE_QUAD    = 2048; // 512 * 4
 
     /**
-     * オフセット定数
+     * ヘッダ内フィールドのオフセット定数
      */
     const MYDESIGN_NAME_OFFSET  = 0;
     const PLAYER_ID_OFFSET      = 0x2a;
@@ -67,19 +70,7 @@ class QRDecoder
     const VILLAGE_ID_OFFSET     = 0x40;
     const VILLAGE_NAME_OFFSET   = 0x42;
     const DESIGN_PALETTE_OFFSET = 0x58;
-    const DESIGN_BITMAP_OFFSET  = 0x6c;
-
-    /**
-     * データ長定数
-     */
-    const MYDESIGN_NAME_LENGTH  = 24;
-    const PLAYER_ID_LENGTH      = 2;
-    const PLAYER_NAME_LENGTH    = 12;
-    const PLAYER_NUMBER_LENGTH  = 2;
-    const VILLAGE_ID_LENGTH     = 2;
-    const VILLAGE_NAME_LENGTH   = 12;
-    const DESIGN_PALETTE_LENGTH = 15;
-    const DESIGN_BITMAP_LENGTH  = 512;
+    const DESIGN_TYPE_OFFSET    = 0x69;
 
     /**
      * 不正なカラーコードを示す値
@@ -193,16 +184,16 @@ class QRDecoder
     /**
      * バイナリデータをデコードしてマイデザインオブジェクトを生成する
      *
-     * @param string $binary
+     * @param string $data
      *
      * @return TobidaseQR\Entity\MyDesign
      *
      * @throws TobidaseQR\Exception\DecoderException,
      *         UnexpectedValueException
      */
-    private function decodeStruct($binary)
+    private function decodeStruct($data)
     {
-        $size = strlen($binary);
+        $size = strlen($data);
         $quad = false;
 
         if ($size === self::DATA_SIZE_QUAD) {
@@ -215,7 +206,7 @@ class QRDecoder
         }
 
         if ($quad) {
-            $terminator = bin2hex(substr($binary, -4));
+            $terminator = bin2hex(substr($data, -4));
             if ($terminator !== '00000000') {
                 throw new DecoderException(
                     "Invalid terminator '{$terminator}'",
@@ -224,16 +215,9 @@ class QRDecoder
             }
         }
 
-        $header = substr($binary, 0, self::DESIGN_BITMAP_OFFSET);
-        $myDesign = $this->decodeHeader($header, $quad);
-
-        try {
-            $bitmap = substr($binary, self::DESIGN_BITMAP_OFFSET);
-            $myDesign->design->bitmap = $this->decodeBitmap($bitmap, $quad);
-        } catch (UnexpectedValueException $e) {
-            $this->offset += self::DESIGN_BITMAP_OFFSET;
-            throw $e;
-        }
+        $myDesign = $this->decodeHeader($data, $quad);
+        $bitmap = $this->decodeBitmap($data, $quad, self::HEADER_SIZE);
+        $myDesign->design->bitmap = $bitmap;
 
         return $myDesign;
     }
@@ -246,9 +230,10 @@ class QRDecoder
      *
      * @return TobidaseQR\Entity\MyDesign
      *
-     * @throws UnexpectedValueException
+     * @throws TobidaseQR\Exception\DecoderException,
+     *         UnexpectedValueException
      */
-    public function decodeHeader($header, $quad)
+    public function decodeHeader($data, $quad)
     {
         $myDesign = new MyDesign;
         $myDesign->name    = null;
@@ -257,86 +242,78 @@ class QRDecoder
         $myDesign->design  = new Design;
         $myDesign->headerExtra = new HeaderExtra;
 
+        $format = implode('/', [
+            'A24' . 'myDesignName',
+            'A18' . 'myDesignNamePadding',
+            'v'   . 'playerId',
+            'A12' . 'playerName',
+            'A6'  . 'playerNamePadding',
+            'v'   . 'playerNumber',
+            'v'   . 'villageId',
+            'A12' . 'villageName',
+            'A8'  . 'villageNamePadding',
+            'C2'  . 'magick',
+            'A15' . 'palette',
+            'C'   . 'paletteExtra',
+            'C'   . 'magickA',
+            'C'   . 'designType',
+            'v'   . 'headerTerminator',
+        ]);
+
+        $values = unpack($format, $data);
+        if (!$values) {
+            throw new DecoderException('Failed to parse header');
+        }
+
+        // デコードと検証が必要な値を処理
         try {
             $this->offset = 0;
 
+            $offset = self::DESIGN_TYPE_OFFSET;
+            $this->validator->validateDesignType($values['designType'], $quad);
+            $myDesign->design->type = $values['designType'];
+
             $offset = self::MYDESIGN_NAME_OFFSET;
-            $length = self::MYDESIGN_NAME_LENGTH;
-            $myDesign->name = $this->decodeMyDesignName(
-                substr($header, $offset, $length)
-            );
-
-            $offset = self::MYDESIGN_NAME_OFFSET + self::MYDESIGN_NAME_LENGTH;
-            $length = self::PLAYER_ID_OFFSET - $offset;
-            $myDesign->headerExtra->myDesignNamePadding
-                = bin2hex(substr($header, $offset, $length));
-
-            $offset = self::PLAYER_ID_OFFSET;
-            $length = self::PLAYER_ID_LENGTH;
-            $myDesign->player->id = unpack('vshort', substr(
-                $header, $offset, $length
-            ))['short'];
+            $name = $this->decodeMyDesignName($values['myDesignName']);
+            $myDesign->name = $name;
 
             $offset = self::PLAYER_NAME_OFFSET;
-            $length = self::PLAYER_NAME_LENGTH;
-            $myDesign->player->name = $this->decodePlayerName(
-                substr($header, $offset, $length)
-            );
-
-            $offset = self::PLAYER_NAME_OFFSET + self::PLAYER_NAME_LENGTH;
-            $length = self::PLAYER_NUMBER_OFFSET - $offset;
-            $myDesign->headerExtra->playerNamePadding
-                = bin2hex(substr($header, $offset, $length));
-
-            $offset = self::PLAYER_NUMBER_OFFSET;
-            $length = self::PLAYER_NUMBER_LENGTH;
-            $myDesign->player->number = unpack('vshort', substr(
-                $header, $offset, $length
-            ))['short'];
-
-            $offset = self::VILLAGE_ID_OFFSET;
-            $length = self::VILLAGE_ID_LENGTH;
-            $myDesign->village->id = unpack('vshort', substr(
-                $header, $offset, $length
-            ))['short'];
+            $name = $this->decodePlayerName($values['playerName']);
+            $myDesign->player->name = $name;
 
             $offset = self::VILLAGE_NAME_OFFSET;
-            $length = self::VILLAGE_NAME_LENGTH;
-            $myDesign->village->name = $this->decodeVillageName(
-                substr($header, $offset, $length)
-            );
-
-            $offset = self::VILLAGE_NAME_OFFSET + self::VILLAGE_NAME_LENGTH;
-            $length = self::DESIGN_PALETTE_OFFSET - $offset;
-            $padding = substr($header, $offset, $length);
-            $numbers = unpack('C2byte', substr($padding, -2));
-            $myDesign->headerExtra->villageNamePadding
-                = bin2hex(substr($padding, 0, -2));
-            $myDesign->headerExtra->magickNumber1 = $numbers['byte1'];
-            $myDesign->headerExtra->magickNumber2 = $numbers['byte2'];
+            $name = $this->decodeVillageName($values['villageName']);
+            $myDesign->village->name = $name;
 
             $offset = self::DESIGN_PALETTE_OFFSET;
-            $length = self::DESIGN_PALETTE_LENGTH;
-            $myDesign->design->palette = $this->decodePalette(
-                substr($header, $offset, $length)
-            );
-
-            $offset = self::DESIGN_PALETTE_OFFSET + self::DESIGN_PALETTE_LENGTH;
-            $length = self::DESIGN_BITMAP_OFFSET - $offset;
-            $padding = substr($header, $offset, $length);
-            $numbers = unpack('C3byte/vshort', substr($header, $offset, $length));
-            $myDesign->headerExtra->paletteExtra = $numbers['byte1'];
-            $myDesign->headerExtra->magickNumberA = $numbers['byte2'];
-            $myDesign->headerExtra->headerTerminator = $numbers['short'];
-
-            $offset += 2;
-            $type = $numbers['byte3'];
-            $this->validator->validateDesignType($type, $quad);
-            $myDesign->design->type = $type;
+            $palette = $this->decodePalette($values['palette']);
+            $myDesign->design->palette = $palette;
         } catch (UnexpectedValueException $e) {
             $this->offset += $offset;
             throw $e;
         }
+
+        // マイデザイン
+        $padding = bin2hex($values['myDesignNamePadding']);
+        $myDesign->headerExtra->myDesignNamePadding = $padding;
+
+        // プレイヤー情報
+        $myDesign->player->id = $values['playerId'];
+        $padding = bin2hex($values['playerNamePadding']);
+        $myDesign->headerExtra->playerNamePadding =  $padding;
+        $myDesign->player->number = $values['playerNumber'];
+
+        // 村情報
+        $myDesign->village->id = $values['villageId'];
+        $padding = bin2hex($values['villageNamePadding']);
+        $myDesign->headerExtra->villageNamePadding = $padding;
+
+        // その他のヘッダフィールド
+        $myDesign->headerExtra->magickNumber1    = $values['magick1'];
+        $myDesign->headerExtra->magickNumber2    = $values['magick2'];
+        $myDesign->headerExtra->paletteExtra     = $values['paletteExtra'];
+        $myDesign->headerExtra->magickNumberA    = $values['magickA'];
+        $myDesign->headerExtra->headerTerminator = $values['headerTerminator'];
 
         return $myDesign;
     }
@@ -422,29 +399,39 @@ class QRDecoder
     /**
      * ビットマップ部をデコードする
      *
-     * @param string $bitmap
+     * @param string $data
      * @param bool $quad
+     * @param int $offset
      *
      * @return int[][]
      *
-     * @throws UnexpectedValueException
+     * @throws TobidaseQR\Exception\DecoderException,
+     *         UnexpectedValueException
      */
-    public function decodeBitmap($bitmap, $quad)
+    public function decodeBitmap($data, $quad, $offset = 0)
     {
         $rowCount = ($quad) ? 108 : 32;
-        $rows = [];
+        $bitmap = [];
 
         for ($rowno = 0; $rowno < $rowCount; $rowno++) {
-            $offset = 16 * $rowno;
-            $rowBytes = array_values(unpack('C16', substr($bitmap, $offset, 16)));
-            $row = [];
+            $rowBytes = unpack('C16', substr($data, $offset, 16));
+            if (!$rowBytes) {
+                $this->offset = $offset;
+                throw new DecoderException(
+                    "Failed to decode bitmap at row {$rowno}",
+                    DecoderException::UNEXPECTED_SEQUENCE
+                );
+            }
 
-            foreach ($rowBytes as $colno => $byte) {
+            $row = [];
+            $colno = 0;
+
+            foreach ($rowBytes as $byte) {
                 $upper = ($byte & 0xf0) >> 4;
                 $lower = $byte & 0xf;
 
                 if ($upper === 0xf || $lower === 0xf) {
-                    $this->offset = $offset + (int)($colno / 2);
+                    $this->offset = $offset;
                     throw new UnexpectedValueException(sprintf(
                         'Unexpected byte 0x%02x found', $byte
                     ), DecoderException::UNEXPECTED_SEQUENCE);
@@ -452,12 +439,14 @@ class QRDecoder
 
                 $row[] = $lower;
                 $row[] = $upper;
+                $colno++;
             }
 
-            $rows[] = $row;
+            $bitmap[] = $row;
+            $offset += 16;
         }
 
-        return $rows;
+        return $bitmap;
     }
 
     /**
