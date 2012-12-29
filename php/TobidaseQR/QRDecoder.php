@@ -422,7 +422,7 @@ class QRDecoder
      */
     public function decodeBitmap($data, $quad, $offset = 0)
     {
-        $rowCount = ($quad) ? 108 : 32;
+        $rowCount = ($quad) ? 128 : 32;
         $bitmap = [];
 
         for ($rowno = 0; $rowno < $rowCount; $rowno++) {
