@@ -63,14 +63,14 @@ class QRDecoder
     /**
      * ヘッダ内フィールドのオフセット定数
      */
-    const MYDESIGN_NAME_OFFSET  = 0;
-    const PLAYER_ID_OFFSET      = 0x2a;
-    const PLAYER_NAME_OFFSET    = 0x2c;
-    const PLAYER_NUMBER_OFFSET  = 0x3e;
-    const VILLAGE_ID_OFFSET     = 0x40;
-    const VILLAGE_NAME_OFFSET   = 0x42;
-    const DESIGN_PALETTE_OFFSET = 0x58;
-    const DESIGN_TYPE_OFFSET    = 0x69;
+    const OFFSET_MYDESIGN_NAME  = 0;
+    const OFFSET_PLAYER_ID      = 0x2a;
+    const OFFSET_PLAYER_NAME    = 0x2c;
+    const OFFSET_PLAYER_NUMBER  = 0x3e;
+    const OFFSET_VILLAGE_ID     = 0x40;
+    const OFFSET_VILLAGE_NAME   = 0x42;
+    const OFFSET_DESIGN_PALETTE = 0x58;
+    const OFFSET_DESIGN_TYPE    = 0x69;
 
     /**
      * 不正なカラーコードを示す値
@@ -158,7 +158,7 @@ class QRDecoder
      */
     public function decodeHexString($hex)
     {
-        if (preg_match('/[^0-9A-Fa-f\\s]/u', $hex, $matches, PREG_OFFSET_CAPTURE)) {
+        if (preg_match('/[^0-9A-Fa-f\\s]/u', $hex, $matches, OFFSET_PREG_CAPTURE)) {
             $char = bin2hex($matches[0][0]);
             $offset = $matches[0][1];
             throw new DecoderException(
@@ -269,23 +269,23 @@ class QRDecoder
         try {
             $this->offset = 0;
 
-            $offset = self::MYDESIGN_NAME_OFFSET;
+            $offset = self::OFFSET_MYDESIGN_NAME;
             $name = $this->decodeMyDesignName($values['myDesignName']);
             $myDesign->name = $name;
 
-            $offset = self::PLAYER_NAME_OFFSET;
+            $offset = self::OFFSET_PLAYER_NAME;
             $name = $this->decodePlayerName($values['playerName']);
             $myDesign->player->name = $name;
 
-            $offset = self::VILLAGE_NAME_OFFSET;
+            $offset = self::OFFSET_VILLAGE_NAME;
             $name = $this->decodeVillageName($values['villageName']);
             $myDesign->village->name = $name;
 
-            $offset = self::DESIGN_PALETTE_OFFSET;
+            $offset = self::OFFSET_DESIGN_PALETTE;
             $palette = $this->decodePalette($values['palette']);
             $myDesign->design->palette = $palette;
 
-            $offset = self::DESIGN_TYPE_OFFSET;
+            $offset = self::OFFSET_DESIGN_TYPE;
             $type = $values['designType'];
             $this->validator->validateDesignType($type, $quad);
             $myDesign->design->type = $type;

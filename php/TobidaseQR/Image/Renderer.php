@@ -39,7 +39,6 @@ use TobidaseQR\Color\Table;
 use TobidaseQR\Entity\Design;
 use TobidaseQR\Entity\MyDesign;
 use Imagick;
-use ImagickDraw;
 use InvalidArgumentException;
 
 /**
