@@ -39,7 +39,9 @@
 
 namespace TobidaseQR;
 
-require __DIR__ . '/utility.php';
+if (!function_exists(__NAMESPACE__ . '\\rgbToLab')) {
+    require __DIR__ . '/utility.php';
+}
 
 $palletR = [
   255, 255, 239, 255, 255, 189, 206, 156, 82,
@@ -109,92 +111,108 @@ $palletB = [
 
 function makeRgbColorTable(array $palletR, array $palletG, array $palletB)
 {
-    $rgbColorTable = [];
+    $table = [];
 
     foreach ($palletR as $index => $red) {
-        $rgbColorTable[] = [$red, $palletG[$index], $palletB[$index]];
+        $table[] = [$red, $palletG[$index], $palletB[$index]];
     }
 
-    return $rgbColorTable;
+    return $table;
 }
 
 function makeLabColorTable(array $rgbColorTable)
 {
-    $labColorTable = [];
+    $table = [];
 
     foreach ($rgbColorTable as $rgb) {
         list($r, $g, $b) = $rgb;
-        $labColorTable[] = rgbToLab($r, $g, $b);
+        $table[] = rgbToLab($r, $g, $b);
     }
 
-    return $labColorTable;
+    return $table;
 }
 
-function makeColorTableCode(
-    array $map,
-    $name,
-    $format,
-    $breakCount,
-    $indent = '    ',
-    $lineBreak = "\n",
-    $initialDepath = 0
-) {
+function makeColorTableCode(array $table, $name, array $defs, array $options = [])
+{
+    $opener = $defs['opener'];
+    $format = $defs['format'];
+    $separator = $defs['separator'];
+    $spacer = $defs['spacer'];
+    $closer = $defs['closer'];
+
+    $defaultOptions = [
+        'indent'        => '    ',
+        'lineBreak'     => "\n",
+        'breakCount'    => 1,
+        'initialDepath' => 0,
+        'trimChars'     => $separator . $spacer,
+    ];
+
+    foreach ($defaultOptions as $key => $value) {
+        $$key = (isset($options[$key])) ? $options[$key] : $value;
+    }
+
     $initialIndent = str_repeat($indent, $initialDepath);
     $elementIndent = str_repeat($indent, $initialDepath + 1);
 
-    $code = $initialIndent . '$' . $name . ' = [';
+    $code = $initialIndent . $name . $opener;
 
-    foreach ($map as $index => $rgb) {
+    foreach ($table as $index => $components) {
         if ($index % $breakCount === 0) {
-            $code .= $lineBreak . $elementIndent;
+            $code .= $separator . $lineBreak . $elementIndent;
         } else {
-            $code .= ' ';
+            $code .= $separator . $spacer;
         }
-        $code .= vsprintf($format, $rgb);
+        $code .= vsprintf($format, $components);
     }
 
-    $code .= $lineBreak . $initialIndent . '];' . $lineBreak;
+    $code = rtrim($code, $trimChars)
+        . $lineBreak . $initialIndent . $closer . $lineBreak;
 
     return $code;
 }
 
-function makeRgbColorTablePhpCode(
-    array $rgbColorTable,
-    $indent = '    ',
-    $lineBreak = "\n",
-    $initialDepath = 0
-) {
+function makeRgbColorTablePhpCode(array $table, array $options = [])
+{
     return makeColorTableCode(
-        $rgbColorTable, 'rgbColorTable', '[%3d, %3d, %3d],',
-        4, $indent, $lineBreak, $initialDepath
+        $table, '$rgbColorTable', [
+            'opener' => ' = [',
+            'format' => '[%3d, %3d, %3d]',
+            'separator' => ',',
+            'spacer' => ' ',
+            'closer' => '];',
+        ], $options
     );
 }
 
-function makeLabColorTablePhpCode(
-    array $labColorTable,
-    $indent = '    ',
-    $lineBreak = "\n",
-    $initialDepath = 0
-) {
+function makeLabColorTablePhpCode(array $table, array $options = [])
+{
     return makeColorTableCode(
-        $labColorTable, 'labColorTable', '[%9.6g, %9.6g, %9.6g],',
-        2, $indent, $lineBreak, $initialDepath
+        $table, '$labColorTable', [
+            'opener' => ' = [',
+            'format' => '[%9.6g, %9.6g, %9.6g]',
+            'separator' => ',',
+            'spacer' => ' ',
+            'closer' => '];',
+        ], $options
     );
 }
 
-function main()
+function codegen()
 {
     global $palletR, $palletG, $palletB;
 
     $rgbColorTable = makeRgbColorTable($palletR, $palletG, $palletB);
     $labColorTable = makeLabColorTable($rgbColorTable);
 
-    echo "// PHP\n";
-    echo makeRgbColorTablePhpCode($rgbColorTable);
-    echo makeLabColorTablePhpCode($labColorTable);
+    echo "# PHP\n";
+    echo makeRgbColorTablePhpCode($rgbColorTable, ['breakCount' => 4]);
+    echo makeLabColorTablePhpCode($labColorTable, ['breakCount' => 2]);
 }
 
-main();
+if (realpath($_SERVER['SCRIPT_NAME']) === __FILE__) {
+    codegen();
+}
 
 /*
  * Local Variables:
