@@ -3,7 +3,7 @@
  * PHP version 5.4
  *
  * とびだせ どうぶつの森™ マイデザインQRコードジェネレータ
- * 画像読み込み・変換クラス
+ * 画像読み込みクラス
  *
  * 「とびだせ どうぶつの森」は任天堂株式会社の登録商標です
  *
@@ -35,92 +35,34 @@
 
 namespace TobidaseQR\Image;
 
-use TobidaseQR\Color\Table;
-use TobidaseQR\Color\Reducer;
-use TobidaseQR\Color\Mapper;
 use Imagick;
-use InvalidArgumentException;
 
 /**
- * 画像読み込み・変換クラス
+ * 画像読み込みクラス
  */
 class Loader
 {
     /**
-     * オプションキー
-     */
-    const OPTION_MAP    = 'map';
-    const OPTION_REDUCE = 'reduce';
-
-    /**
-     * 幅
-     *
-     * @var int
-     */
-    private $width;
-
-    /**
-     * 高さ
-     *
-     * @var int
-     */
-    private $height;
-
-    /**
-     * コンストラクタ
-     *
-     * @param int $width
-     * @param int $height
-     */
-    public function __construct($width, $height)
-    {
-        $this->width = $width;
-        $this->height = $height;
-    }
-
-    /**
      * 画像を読み込む
      *
-     * @param Imagick $image
-     * @param array $options
+     * @param mixed $source Imagickオブジェクトもしくは画像ファイルのパス
+     * @param int $width
+     * @param int $height
      *
-     * @return array ($palette, $data)
+     * @return Imagick
      */
-    public function load(Imagick $image, array $options = [])
+    public function load($source, $width, $height)
     {
-        $this->correctColorSpace($image);
-        $this->resize($image);
-
-        $reduceOptions = [];
-        $mapOptions = [];
-
-        foreach ([self::OPTION_MAP, self::OPTION_REDUCE] as $optKey) {
-            if (array_key_exists($optKey, $options)) {
-                $optValue = $options[$optKey];
-                if (!is_array($optValue)) {
-                    throw new InvalidArgumentException(
-                        "\$options['{$optKey}'] must be an array"
-                    );
-                }
-                ${$optKey . 'Options'} = $optValue;
-            }
-        }
-
-        $table = new Table;
-        $histgram = $table->createHistgram($image, $reduceOptions);
-
-        $reducer = new Reducer($table->getRgbColorTable(), $reduceOptions);
-        $reducedTable = $reducer->reduceColor($histgram);
-
-        if (!empty($mapOptions[Mapper::OPTION_DITHERING])) {
-            $mapper = new Mapper\DitheringMapper;
+        if ($source instanceof Imagick) {
+            $image = clone $source;
         } else {
-            $mapper = new Mapper\SimpleMapper;
+            $image = new Imagick($source);
         }
 
-        $rows = $mapper->map($image, $reducedTable, $mapOptions);
+        $this->correctImageColorSpace($image);
+        $this->resizeImage($image, $width, $height);
 
-        return [$reducedTable->getRgbColorTable(), $rows];
+        return $image;
     }
 
     /**
@@ -130,7 +72,7 @@ class Loader
      *
      * @return void
      */
-    public function correctColorSpace(Imagick $image)
+    public function correctImageColorSpace(Imagick $image)
     {
         $cs = $image->getColorspace();
         if ($cs !== Imagick::COLORSPACE_RGB
@@ -144,49 +86,51 @@ class Loader
      * 画像をリサイズする
      *
      * @param Imagick $image
+     * @param int $width
+     * @param int $height
      *
      * @return void
      */
-    public function resize(Imagick $image)
+    public function resizeImage(Imagick $image, $width, $height)
     {
-        $width = $image->getImageWidth();
-        $height = $image->getImageHeight();
+        $srcWidth = $image->getImageWidth();
+        $srcHeight = $image->getImageHeight();
 
         // 小さい画像を引き伸ばす
-        if ($width < $this->width || $height < $this->height) {
-            if ($width / $height > $this->width / $this->height) {
+        if ($srcWidth < $width || $srcHeight < $height) {
+            if ($srcWidth / $srcHeight > $width / $height) {
                 // 横長画像→縦を合わせ、横ははみ出す
-                $tmpWidth = round($this->height * $width / $height);
-                $tmpHeight = $this->height;
-                $ratio = $tmpHeight / $height;
+                $tmpWidth = round($height * $srcWidth / $srcHeight);
+                $tmpHeight = $height;
+                $ratio = $tmpHeight / $srcHeight;
             } else {
                 // 縦長画像→横を合わせ、縦ははみ出す
-                $tmpHeight = round($this->width * $height / $width);
-                $tmpWidth = $this->width;
-                $ratio = $tmpWidth / $width;
+                $tmpHeight = round($width * $srcHeight / $srcWidth);
+                $tmpWidth = $width;
+                $ratio = $tmpWidth / $srcWidth;
             }
 
             if (0.75 < $ratio && $ratio < 1.25) {
                 $image->adaptiveResizeImage($tmpWidth, $tmpHeight, true);
             } else {
                 $image->resizeImage(
-                    $tmpWidth, $tmpHeight, Imagick::FILTER_LANCZOS, 1.0, true
+                    $tmpWidth, $tmpHeight, $this->filter, $this->blur, true
                 );
             }
 
-            $width = $tmpWidth;
-            $height = $tmpHeight;
+            $srcWidth = $tmpWidth;
+            $srcHeight = $tmpHeight;
         }
 
         // はみ出る部分をカットする
-        if ($width > $this->width) {
+        if ($srcWidth > $width) {
             $image->cropImage(
-                $this->width, $height, floor(($width - $this->width) / 2), 0
+                $width, $srcHeight, floor(($srcWidth - $width) / 2), 0
             );
         }
-        if ($height > $this->height) {
+        if ($srcHeight > $height) {
             $image->cropImage(
-                $width, $this->height, 0, floor(($height - $this->height) / 2)
+                $srcWidth, $height, 0, floor(($srcHeight - $height) / 2)
             );
         }
     }

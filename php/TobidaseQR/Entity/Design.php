@@ -3,7 +3,7 @@
  * PHP version 5.4
  *
  * とびだせ どうぶつの森™ マイデザインQRコードジェネレータ
- * プレイヤーエンティティクラス
+ * デザインエンティティクラス
  *
  * 「とびだせ どうぶつの森」は任天堂株式会社の登録商標です
  *
@@ -35,33 +35,50 @@
 
 namespace TobidaseQR\Entity;
 
-use TobidaseQR\Validator;
-
 /**
- * プレイヤーエンティティクラス
+ * デザインエンティティクラス
  */
-class Player
+class Design
 {
     /**
-     * プレイヤーID (32bit)
+     * デザインタイプ定数
+     */
+    // ワンピース（長袖、半袖、ノースリーブ）
+    const TYPE_DRESS_LONG_SLEEEVED  = 0;
+    const TYPE_DRESS_SHORT_SLEEEVED = 1;
+    const TYPE_DRESS_NO_SLEEEVE     = 2;
+    // Tシャツ（長袖、半袖、ノースリーブ）
+    const TYPE_SHIRT_LONG_SLEEEVED  = 3;
+    const TYPE_SHIRT_SHORT_SLEEEVED = 4;
+    const TYPE_SHIRT_NO_SLEEEVE     = 5;
+    // 帽子（ニット帽、つの帽子）
+    const TYPE_HAT_KNIT   = 6;
+    const TYPE_HAT_HORNED = 7;
+    // 不明
+    const TYPE_UNKNOWN = 8;
+    // 一般
+    const TYPE_GENERIC = 9;
+
+    /**
+     * デザインタイプ
      *
      * @var int
      */
-    public $id;
+    public $type;
 
     /**
-     * プレイヤー番号 (0-3)
+     * カラーパレット
      *
-     * @var int
+     * @var int[]
      */
-    public $number;
+    public $palette;
 
     /**
-     * プレイヤー名 (Unicode 1-6文字)
+     * ビットマップデータ
      *
-     * @var string
+     * @var int[][]
      */
-    public $name;
+    public $bitmap;
 }
 
 /*

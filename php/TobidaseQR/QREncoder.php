@@ -35,6 +35,7 @@
 
 namespace TobidaseQR;
 
+use TobidaseQR\Entity\Design;
 use TobidaseQR\Entity\MyDesign;
 use TobidaseQR\Entity\Player;
 use TobidaseQR\Entity\Village;
@@ -89,25 +90,20 @@ class QREncoder
      * QRコードオブジェクトを作成する
      *
      * @param MyDesign $myDesign
-     * @param Player $player
-     * @param Village $village
      *
      * @return QRCode
      */
-    public function makeQRCode(
-        MyDesign $myDesign,
-        Player $player,
-        Village $village
-    ) {
-        if ($this->checkStructuredType($myDesign->getType())) {
+    public function makeQRCode(MyDesign $myDesign)
+    {
+        $options = $this->options;
+        if ($this->checkStructuredType($myDesign->design->type)) {
             $options['maxnum'] = 4;
         } else {
             $options['maxnum'] = 1;
         }
 
-        $data = $this->makeData($myDesign, $player, $village);
-        $qr = new QRCode($this->options);
-        $qr->addData($data, QRCode::EM_8BIT);
+        $qr = new QRCode($options);
+        $qr->addData($this->makeData($myDesign), QRCode::EM_8BIT);
         $qr->finalize();
 
         return $qr;
@@ -117,24 +113,20 @@ class QREncoder
      * QRコードの元となるデータを組み立てる
      *
      * @param MyDesign $myDesign
-     * @param Player $player
-     * @param Village $village
      *
      * @return string
      */
-    public function makeData(
-        MyDesign $myDesign,
-        Player $player,
-        Village $village
-    ) {
-        $data = $this->makeHeader($myDesign, $player, $village)
-            . $this->makePalette($myDesign)
-            . $this->makeBitmap($myDesign);
+    public function makeData(MyDesign $myDesign)
+    {
+        $design = $myDesign->design;
+        $data = $this->makeHeader($myDesign)
+            . $this->makePalette($design)
+            . $this->makeBitmap($design);
 
         // 連結QRコードを生成するタイプの場合は
         // バイト数が切りの良い数字になるように
         // ゼロパディングする
-        if ($this->checkStructuredType($myDesign->getType())) {
+        if ($this->checkStructuredType($design->type)) {
             $data .= pack('V', 0);
         }
 
@@ -145,34 +137,32 @@ class QREncoder
      * QRコードの元となるデータのヘッダ部を組み立てる
      *
      * @param MyDesign $myDesign
-     * @param Player $player
-     * @param Village $village
      *
      * @return string
      */
-    public function makeHeader(
-        MyDesign $myDesign,
-        Player $player,
-        Village $village
-    ) {
-        $dName = $this->encodeString($myDesign->getName());
-        $pName = $this->encodeString($player->getName());
-        $vName = $this->encodeString($village->getName());
+    public function makeHeader(MyDesign $myDesign)
+    {
+        $player  = $myDesign->player;
+        $village = $myDesign->village;
 
-        return pack('a40v', $dName, 0)
-            . pack('va18v', $player->getId(), $pName, $player->getNumber())
-            . pack('va18v', $village->getId(), $vName, 0)
+        $myDesignName = $this->encodeString($myDesign->name);
+        $playerName   = $this->encodeString($player->name);
+        $villageName  = $this->encodeString($village->name);
+
+        return pack('a40v', $myDesignName, 0)
+            . pack('va18v', $player->id, $playerName, $player->number)
+            . pack('va18v', $village->id, $villageName, 0)
             . pack('CC', self::MAGICK_1, self::MAGICK_2);
     }
 
     /**
      * QRコードの元となるデータのパレット部(+α)を組み立てる
      *
-     * @param MyDesign $myDesign
+     * @param Design $design
      *
      * @return string
      */
-    public function makePalette(MyDesign $myDesign)
+    public function makePalette(Design $design)
     {
         $colors = [
             0x0f, 0x1f, 0x2f,
@@ -182,16 +172,13 @@ class QREncoder
             0xcf, 0xdf, 0xef,
         ];
 
-        foreach ($myDesign->getPalette() as $index => $code) {
-            if ($code < 144) {
-                $colors[$index] = ((int)($code / 9) << 4) | ($code % 9);
-            } else {
-                $colors[$index] = (($code - 144) << 4) | 0xf;
-            }
+        foreach ($design->palette as $index => $code) {
+            $colors[$index] = $this->encodeColorCode($code);
         }
 
         // パレットに続く8bit値
-        // 今のところ謎なので仮にxorハッシュを求めてみる
+        // 今のところ謎なので仮にXORハッシュを求めてみる
+        // @FIXME 正確な値を出せるようにしたい
         $hash = 0x3d;
         foreach ($colors as $code) {
             $hash ^= $code;
@@ -201,22 +188,22 @@ class QREncoder
         array_unshift($colors, 'C16');
 
         return call_user_func_array('pack', $colors)
-            . pack('CCv', self::MAGICK_A, $myDesign->getType(), 0);
+            . pack('CCv', self::MAGICK_A, $design->type, 0);
     }
 
     /**
      * QRコードの元となるデータのビットマップ部を組み立てる
      *
-     * @param MyDesign $myDesign
+     * @param Design $design
      *
      * @return string
      */
-    public function makeBitmap(MyDesign $myDesign)
+    public function makeBitmap(Design $design)
     {
-        $ipalette = array_flip($myDesign->getPalette());
+        $ipalette = array_flip($design->palette);
         $data = '';
 
-        foreach ($myDesign->getData() as $row) {
+        foreach ($design->bitmap as $row) {
             $pack = ['C*'];
             $value = 0;
             $colno = 0;
@@ -237,7 +224,7 @@ class QREncoder
     }
 
     /**
-     * UTF-8文字列をUCS-2LEに変換する
+     * UTF-8文字列をUCS-2LE文字列に変換する
      *
      * @param string $str
      *
@@ -246,6 +233,25 @@ class QREncoder
     private function encodeString($str)
     {
         return mb_convert_encoding($str, 'UCS-2LE', 'UTF-8');
+    }
+
+    /**
+     * カラーコードを0から始まる連番の内部表記から
+     * QRコード用の表記に変換する
+     *
+     * @param int $code
+     *
+     * @return int
+     */
+    private function encodeColorCode($code)
+    {
+        if ($code < 144) {
+            // カラー9x16色
+            return ((int)($code / 9) << 4) | ($code % 9);
+        } else {
+            // モノクロ15色
+            return (($code - 144) << 4) | 0xf;
+        }
     }
 
     /**
@@ -258,12 +264,12 @@ class QREncoder
     private function checkStructuredType($type)
     {
         return in_array($type, [
-            MyDesign::TYPE_DRESS_LONG_SLEEEVED,
-            MyDesign::TYPE_DRESS_SHORT_SLEEEVED,
-            MyDesign::TYPE_DRESS_NO_SLEEEVE,
-            MyDesign::TYPE_SHIRT_LONG_SLEEEVED,
-            MyDesign::TYPE_SHIRT_SHORT_SLEEEVED,
-            MyDesign::TYPE_SHIRT_NO_SLEEEVE,
+            Design::TYPE_DRESS_LONG_SLEEEVED,
+            Design::TYPE_DRESS_SHORT_SLEEEVED,
+            Design::TYPE_DRESS_NO_SLEEEVE,
+            Design::TYPE_SHIRT_LONG_SLEEEVED,
+            Design::TYPE_SHIRT_SHORT_SLEEEVED,
+            Design::TYPE_SHIRT_NO_SLEEEVE,
         ]);
     }
 }

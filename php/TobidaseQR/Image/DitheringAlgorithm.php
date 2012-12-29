@@ -46,19 +46,19 @@ interface DitheringAlgorithm
     /**
      * コンストラクタ
      *
-     * @param TobidaseQR\Color\Table $table
      * @param array $options
      */
-    public function __construct(Table $table, array $options = []);
+    public function __construct(array $options = []);
 
     /**
      * 画像にディザリングを適用する
      *
      * @param Imagick $image
+     * @param TobidaseQR\Color\Table $table
      *
      * @return int[][] カラーコードの2次元配列
      */
-    public function apply(Imagick $image);
+    public function apply(Imagick $image, Table $table);
 }
 
 /*

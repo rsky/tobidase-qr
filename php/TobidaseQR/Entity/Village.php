@@ -47,51 +47,14 @@ class Village
      *
      * @var int
      */
-    private $id;
+    public $id;
 
     /**
      * 村名 (Unicode 1-6文字)
      *
      * @var string
      */
-    private $name;
-
-    /**
-     * コンストラクタ
-     *
-     * @param int $id
-     * @param string $name
-     */
-    public function __construct($id, $name)
-    {
-        (new Validator)->validateVillageName($name);
-        $this->id = $id;
-        $this->name = $name;
-    }
-
-    /**
-     * 村IDを返す
-     *
-     * @param void
-     *
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * 村名を返す
-     *
-     * @param void
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
+    public $name;
 }
 
 /*

@@ -103,15 +103,14 @@ abstract class ErrorDiffusionDithering implements DitheringAlgorithm
     /**
      * コンストラクタ
      *
-     * @param TobidaseQR\Color\Table $table
      * @param array $options
      */
-    public function __construct(Table $table, array $options = [])
+    public function __construct(array $options = [])
     {
-        $this->colorTable = $table;
         $this->weaving = (isset($options[self::OPTION_WEAVING_SCAN]))
             ? (bool)$options[self::OPTION_WEAVING_SCAN]
             : true;
+
         $this->weight = (isset($options[self::OPTION_DIFFUSION_WEIGHT]))
             ? (float)$options[self::OPTION_DIFFUSION_WEIGHT]
             : self::DEFAULT_DIFFUSION_WEIGHT;
@@ -153,12 +152,14 @@ abstract class ErrorDiffusionDithering implements DitheringAlgorithm
      * 画像に誤差拡散法によるディザリングを適用する
      *
      * @param Imagick $image
+     * @param TobidaseQR\Color\Table $table
      *
      * @return int[][] カラーコードの2次元配列
      */
-    public function apply(Imagick $image)
+    public function apply(Imagick $image, Table $table)
     {
         $this->image = $image;
+        $this->colorTable = $table;
         $width  = $image->getImageWidth();
         $height = $image->getImageHeight();
         $this->init($width, $height);

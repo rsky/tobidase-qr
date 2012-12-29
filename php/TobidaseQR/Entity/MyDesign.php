@@ -35,208 +35,38 @@
 
 namespace TobidaseQR\Entity;
 
-use TobidaseQR\Validator;
-use TobidaseQR\Image\Loader;
-use Imagick;
-use InvalidArgumentException;
-
 /**
  * マイデザインエンティティクラス
  */
 class MyDesign
 {
     /**
-     * デザインタイプ定数
-     */
-    // ワンピース（長袖、半袖、ノースリーブ）
-    const TYPE_DRESS_LONG_SLEEEVED  = 0;
-    const TYPE_DRESS_SHORT_SLEEEVED = 1;
-    const TYPE_DRESS_NO_SLEEEVE     = 2;
-    // Tシャツ（長袖、半袖、ノースリーブ）
-    const TYPE_SHIRT_LONG_SLEEEVED  = 3;
-    const TYPE_SHIRT_SHORT_SLEEEVED = 4;
-    const TYPE_SHIRT_NO_SLEEEVE     = 5;
-    // 帽子（ニット帽、つの帽子）
-    const TYPE_HAT_KNIT   = 6;
-    const TYPE_HAT_HORNED = 7;
-    // 不明
-    const TYPE_UNKNOWN = 8;
-    // 一般
-    const TYPE_GENERIC = 9;
-
-    /**
      * マイデザイン名
      *
      * @var string
      */
-    private $name;
+    public $name;
 
     /**
-     * デザインタイプ
+     * プレイヤー
      *
-     * @var int
+     * @var Player
      */
-    private $type;
+    public $player;
 
     /**
-     * 幅
+     * 村
      *
-     * @var int
+     * @var Village
      */
-    private $width;
+    public $village;
 
     /**
-     * 高さ
+     * デザイン
      *
-     * @var int
+     * @var Design
      */
-    private $height;
-
-    /**
-     * カラーテーブル
-     *
-     * @var array
-     */
-    private $table;
-
-    /**
-     * 画像データ
-     *
-     * @var int[][]
-     */
-    private $rows;
-
-    /**
-     * コンストラクタ
-     *
-     * @param int $type
-     */
-    public function __construct($type = self::TYPE_GENERIC)
-    {
-        list($width, $height) = $this->getSizeForType($type);
-        $this->type = $type;
-        $this->width = $width;
-        $this->height = $height;
-    }
-
-    /**
-     * 画像タイプに応じたサイズを返す
-     *
-     * @param int $type
-     *
-     * @return int[] ($width, $height)
-     */
-    public function getSizeForType($type)
-    {
-        switch ($type) {
-            case self::TYPE_GENERIC:
-            case self::TYPE_HAT_KNIT:
-            case self::TYPE_HAT_HORNED:
-                return [32, 32];
-            case self::TYPE_DRESS_LONG_SLEEEVED:
-            case self::TYPE_DRESS_SHORT_SLEEEVED:
-            case self::TYPE_DRESS_NO_SLEEEVE:
-            case self::TYPE_SHIRT_LONG_SLEEEVED:
-            case self::TYPE_SHIRT_SHORT_SLEEEVED:
-            case self::TYPE_SHIRT_NO_SLEEEVE:
-                return [64, 64];
-        }
-
-        throw new InvalidArgumentException("Unsupported type: {$type}");
-    }
-
-    /**
-     * デザインタイプを返す
-     *
-     * @param void
-     *
-     * @return int
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
-     * マイデザイン名を返す
-     *
-     * @param void
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * カラーテーブルを返す
-     *
-     * @param void
-     *
-     * @return array
-     */
-    public function getColorTable()
-    {
-        return $this->table;
-    }
-
-    /**
-     * カラーパレットを返す
-     *
-     * @param void
-     *
-     * @return int[]
-     */
-    public function getPalette()
-    {
-        return array_keys($this->table);
-    }
-
-    /**
-     * ピクセルデータ（カラーコードの2次元配列）を返す
-     *
-     * @param void
-     *
-     * @return int[][]
-     */
-    public function getData()
-    {
-        return $this->data;
-    }
-
-    /**
-     * マイデザイン名をセットする
-     *
-     * @param string $name
-     *
-     * @return void
-     *
-     * @throws InvalidArgumentException
-     */
-    public function setName($name)
-    {
-        (new Validator)->validateMyDesignName($name);
-        $this->name = $name;
-    }
-
-    /**
-     * 画像を読み込む
-     *
-     * @param Imagick $image
-     * @param array $options
-     *
-     * @return void
-     *
-     * @see TobidaseQR\ImageLoader::load()
-     */
-    public function loadImage(Imagick $image, array $options = [])
-    {
-        $loader = new Loader($this->width, $this->height);
-        list($table, $data) = $loader->load($image, $options);
-        $this->table = $table;
-        $this->data = $data;
-    }
+    public $design;
 }
 
 /*

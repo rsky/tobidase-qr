@@ -3,7 +3,7 @@
  * PHP version 5.4
  *
  * とびだせ どうぶつの森™ マイデザインQRコードジェネレータ
- * プレイヤーエンティティクラス
+ * 画像を描画するクラス
  *
  * 「とびだせ どうぶつの森」は任天堂株式会社の登録商標です
  *
@@ -33,35 +33,73 @@
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  */
 
-namespace TobidaseQR\Entity;
+namespace TobidaseQR\Image;
 
-use TobidaseQR\Validator;
+use TobidaseQR\Color\Table;
+use TobidaseQR\Entity\Design;
+use TobidaseQR\Entity\MyDesign;
+use Imagick;
 
 /**
- * プレイヤーエンティティクラス
+ * 画像を描画するクラス
  */
-class Player
+class Render
 {
     /**
-     * プレイヤーID (32bit)
+     * カラーテーブル
      *
-     * @var int
+     * @var TobidaseQR\Color\Table
      */
-    public $id;
+    protected $table;
 
     /**
-     * プレイヤー番号 (0-3)
+     * コンストラクタ
      *
-     * @var int
+     * @param TobidaseQR\Color\Table $table
      */
-    public $number;
+    public function __construct(Table $table = null)
+    {
+        $this->table = $table ?: new Table;
+    }
 
     /**
-     * プレイヤー名 (Unicode 1-6文字)
+     * ビットマップデータをImagickオブジェクトに描画する
      *
-     * @var string
+     * @param int[][] $bitmap
+     * @param int[] $palette
+     * @param int $magnify
+     *
+     * @return Imagick
      */
-    public $name;
+    public function renderBitmap(array $bitmap, array $palette, $magnify = 1)
+    {
+    }
+
+    /**
+     * デザインオブジェクトをImagickオブジェクトに描画する
+     *
+     * @param TobidaseQR\Entity\Design $design
+     * @param int $magnify
+     *
+     * @return Imagick
+     */
+    public function renderDesign(Design $design, $magnify = 1)
+    {
+        return $this->renderBitmap($design->bitmap, $design->palette, $magnify);
+    }
+
+    /**
+     * マイデザインオブジェクトをImagickオブジェクトに描画する
+     *
+     * @param TobidaseQR\Entity\MyDesign $myDesign
+     * @param int $magnify
+     *
+     * @return Imagick
+     */
+    public function renderMyDesign(MyDesign $myDesign, $magnify = 1)
+    {
+        return $this->renderDesign($myDesign->design, $magnify);
+    }
 }
 
 /*

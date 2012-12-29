@@ -35,7 +35,7 @@
 
 namespace TobidaseQR;
 
-use InvalidArgumentException;
+use TobidaseQR\Exception\ValidatorException;
 
 /**
  * バリデータクラス
@@ -56,7 +56,7 @@ class Validator
      *
      * @return void
      *
-     * @throws InvalidArgumentException
+     * @throws ValidatorException
      */
     public function validateMyDesignName($name)
     {
@@ -70,7 +70,7 @@ class Validator
      *
      * @return void
      *
-     * @throws InvalidArgumentException
+     * @throws ValidatorException
      */
     public function validatePlayerName($name)
     {
@@ -84,7 +84,7 @@ class Validator
      *
      * @return void
      *
-     * @throws InvalidArgumentException
+     * @throws ValidatorException
      */
     public function validateVillageName($name)
     {
@@ -99,21 +99,22 @@ class Validator
      *
      * @return void
      *
-     * @throws InvalidArgumentException
+     * @throws ValidatorException
      */
     public function validateString($value, $maxLength)
     {
         if (mb_detect_encoding($value, 'UTF-8,ISO-8859-1', true) !== 'UTF-8') {
-            throw new InvalidArgumentException('Not a valid UTF-8 string');
+            throw new ValidatorException('Not a valid UTF-8 string');
         }
         if (strlen($value) === 0) {
-            throw new InvalidArgumentException('Empty value');
+            throw new ValidatorException('Empty value');
         }
         if (mb_strlen($value, 'UTF-8') > $maxLength) {
-            throw new InvalidArgumentException('Too long value');
+            throw new ValidatorException('Too long value');
         }
+        /** @TODO 厳密なホワイトリスト方式にする */
         if (preg_match('/[\\0-\\x19\\x7F]/u', $value)) {
-            throw new InvalidArgumentException('Invalid characters found');
+            throw new ValidatorException('Invalid characters found');
         }
     }
 }

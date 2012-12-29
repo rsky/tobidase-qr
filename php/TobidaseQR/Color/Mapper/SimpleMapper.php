@@ -36,7 +36,6 @@
 namespace TobidaseQR\Color\Mapper;
 
 use TobidaseQR\Color\Table;
-use TobidaseQR\Color\Mapper;
 use Imagick;
 
 /**
@@ -44,7 +43,7 @@ use Imagick;
  *
  * パレットの中から最も近い色が選ばれる
  */
-class SimpleMapper implements Mapper
+class SimpleMapper extends AbstractMapper
 {
     /**
      * 画像の各ピクセルにカラーコードを割り当てる
@@ -55,7 +54,7 @@ class SimpleMapper implements Mapper
      *
      * @return int[][] カラーコードの2次元配列
      */
-    public function map(Imagick $image, Table $table, array $options = [])
+    public function map(Imagick $image, Table $table)
     {
         $palette = $table->getRgbColorTable();
         $width  = $image->getImageWidth();

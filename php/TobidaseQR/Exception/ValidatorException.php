@@ -3,7 +3,7 @@
  * PHP version 5.4
  *
  * とびだせ どうぶつの森™ マイデザインQRコードジェネレータ
- * プレイヤーエンティティクラス
+ * バリデーション例外クラス
  *
  * 「とびだせ どうぶつの森」は任天堂株式会社の登録商標です
  *
@@ -33,35 +33,13 @@
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  */
 
-namespace TobidaseQR\Entity;
-
-use TobidaseQR\Validator;
+namespace TobidaseQR\Exception;
 
 /**
- * プレイヤーエンティティクラス
+ * バリデーション例外クラス
  */
-class Player
+class ValidatorException extends \InvalidArgumentException
 {
-    /**
-     * プレイヤーID (32bit)
-     *
-     * @var int
-     */
-    public $id;
-
-    /**
-     * プレイヤー番号 (0-3)
-     *
-     * @var int
-     */
-    public $number;
-
-    /**
-     * プレイヤー名 (Unicode 1-6文字)
-     *
-     * @var string
-     */
-    public $name;
 }
 
 /*

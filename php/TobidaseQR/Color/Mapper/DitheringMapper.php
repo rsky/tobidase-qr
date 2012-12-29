@@ -36,17 +36,15 @@
 namespace TobidaseQR\Color\Mapper;
 
 use TobidaseQR\Color\Table;
-use TobidaseQR\Color\Mapper;
 use Imagick;
 use InvalidArgumentException;
 
 /**
  * 入力画像の各ピクセルにカラーコードを割り当てるクラス
  *
- * 誤差拡散法（Floyd-Steinberg法）でディザリングした結果に
- * 最も近いパレットの中の色が選ばれる
+ * パレットの中からディザリングした結果に最も近いものを割り当てる
  */
-class DitheringMapper implements Mapper
+class DitheringMapper extends AbstractMapper
 {
     /**
      * オプションキー
@@ -56,17 +54,14 @@ class DitheringMapper implements Mapper
     /**
      * ディザリングアルゴリズム
      */
-    const ALGO_FLOYD_STEINBERG
-        = 'TobidaseQR\Image\Dithering\FloydSteinberg';
-    const ALGO_FALSE_FLOYD_STEINBERG
-        = 'TobidaseQR\Image\Dithering\FalseFloydSteinberg';
-    const ALGO_JARVIS_JUDICE_NINKE
-        = 'TobidaseQR\Image\Dithering\JarvisJudiceNinke';
-    const ALGO_STUCKI      = 'TobidaseQR\Image\Dithering\Stucki';
-    const ALGO_BURKES      = 'TobidaseQR\Image\Dithering\Burkes';
-    const ALGO_SIERRA3     = 'TobidaseQR\Image\Dithering\Sierra3';
-    const ALGO_SIERRA2     = 'TobidaseQR\Image\Dithering\Sierra2';
-    const ALGO_SIERRA_2_4A = 'TobidaseQR\Image\Dithering\Sierra24A';
+    const ALGO_FLOYD_STEINBERG       = 'FloydSteinberg';
+    const ALGO_FALSE_FLOYD_STEINBERG = 'FalseFloydSteinberg';
+    const ALGO_JARVIS_JUDICE_NINKE   = 'JarvisJudiceNinke';
+    const ALGO_STUCKI      = 'Stucki';
+    const ALGO_BURKES      = 'Burkes';
+    const ALGO_SIERRA3     = 'Sierra3';
+    const ALGO_SIERRA2     = 'Sierra2';
+    const ALGO_SIERRA_2_4A = 'Sierra24A';
 
     /**
      * ディザリングアルゴリズムの別名
@@ -77,31 +72,41 @@ class DitheringMapper implements Mapper
     const ALGO_DEFAULT     = self::ALGO_SIERRA3;
 
     /**
-     * 画像の各ピクセルにカラーコードを割り当てる
+     * ディザリングアルゴリズムを実装したオブジェクト
      *
-     * @param Imagick $image
-     * @param TobidaseQR\Color\Table $table
-     * @param array $options
-     *
-     * @return int[][] カラーコードの2次元配列
-     *
-     * @throws InvalidArgumentException
+     * @var TobidaseQR\Image\DitheringAlgorithm
      */
-    public function map(Imagick $image, Table $table, array $options = [])
+    private $dithering;
+
+    /**
+     * コンストラクタ
+     *
+     * @param array $options
+     */
+    public function __construct(array $options = [])
     {
+        parent::__construct($options);
+
         $algorithm = (isset($options[self::OPTION_ALGORITHM]))
             ? $options[self::OPTION_ALGORITHM]
             : self::ALGO_DEFAULT;
 
-        if (!class_exists($algorithm)
-            || !is_a($algorithm, 'TobidaseQR\\Image\\DitheringAlgorithm', true)
-        ) {
-            throw InvalidArgumentException(
-                "{$algorithm} is not a kind of DitheringAlgorithm"
-            );
-        }
+        $ditheringClass = 'TobidaseQR\\Image\\Dithering\\' . $algorithm;
 
-        return (new $algorithm($table, $options))->apply($image);
+        $this->dithering = new $ditheringClass($options);
+    }
+
+    /**
+     * 画像の各ピクセルにカラーコードを割り当てる
+     *
+     * @param Imagick $image
+     * @param TobidaseQR\Color\Table $table
+     *
+     * @return int[][] カラーコードの2次元配列
+     */
+    public function map(Imagick $image, Table $table)
+    {
+        return $this->dithering->apply($image, $table);
     }
 }
 

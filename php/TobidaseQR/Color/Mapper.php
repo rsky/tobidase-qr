@@ -3,7 +3,7 @@
  * PHP version 5.4
  *
  * とびだせ どうぶつの森™ マイデザインQRコードジェネレータ
- * 入力画像の各ピクセルをカラーコードにマッピングするインターフェイス
+ * 入力画像の各ピクセルをカラーコードにマッピングするクラス
  *
  * 「とびだせ どうぶつの森」は任天堂株式会社の登録商標です
  *
@@ -38,14 +38,37 @@ namespace TobidaseQR\Color;
 use Imagick;
 
 /**
- * 入力画像の各ピクセルにカラーコードを割り当てるインターフェイス
+ * 入力画像の各ピクセルにカラーコードを割り当てるクラス
  */
-interface Mapper
+class Mapper implements MapperInterface
 {
     /**
      * オプションキー
      */
     const OPTION_DITHERING  = 'dithering';
+
+    /**
+     * 実際に色の割当を行うクラス
+     *
+     * @var TobidaseQR\Color\Mapper\AbstractMapper
+     */
+    private $innerMapper;
+
+    /**
+     * コンストラクタ
+     *
+     * @param array $options
+     */
+    public function __construct(array $options = [])
+    {
+        $mapperClass = 'TobidaseQR\\Color\\Mapper\\';
+        if (!empty($options[Mapper::OPTION_DITHERING])) {
+            $mapperClass .= 'DitheringMapper';
+        } else {
+            $mapperClass .= 'SimpleMapper';
+        }
+        $this->innerMapper = new $mapperClass($options);
+    }
 
     /**
      * 画像の各ピクセルにカラーコードを割り当てる
@@ -54,9 +77,12 @@ interface Mapper
      * @param TobidaseQR\Color\Table $table
      * @param array $options
      *
-     * @return int[]
+     * @return int[][] カラーコードの2次元配列
      */
-    public function map(Imagick $image, Table $table, array $options = []);
+    public function map(Imagick $image, Table $table)
+    {
+        return $this->innerMapper->map($image, $table);
+    }
 }
 
 /*

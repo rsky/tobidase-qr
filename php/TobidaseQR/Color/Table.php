@@ -36,7 +36,6 @@
 namespace TobidaseQR\Color;
 
 use TobidaseQR\Color;
-use TobidaseQR\Color\Mapper;
 use Imagick;
 use InvalidArgumentException;
 use OutOfBoundsException;
@@ -415,22 +414,16 @@ class Table
      * Imagickオブジェクトから近似色のヒストグラムを作成する
      *
      * @param Imagick $image 色空間は COLORSPACE_RGB or COLORSPACE_SRGB
-     * @param array $options
+     * @param TobidaseQR\Color\Mapper $mapper
      *
      * @return array
      */
-    public function createHistgram(Imagick $image, array $options = [])
+    public function createHistgram(Imagick $image, Mapper $mapper)
     {
         $colorNum = self::COLORCODE_MAX - self::COLORCODE_MIN + 1;
         $histgram = array_fill(self::COLORCODE_MIN, $colorNum, 0);
 
-        if (!empty($options[Mapper::OPTION_DITHERING])) {
-            $mapper = new Mapper\DitheringMapper;
-        } else {
-            $mapper = new Mapper\SimpleMapper;
-        }
-
-        foreach ($mapper->map($image, $this, $options) as $row) {
+        foreach ($mapper->map($image, $this) as $row) {
             foreach ($row as $code) {
                 $histgram[$code]++;
             }

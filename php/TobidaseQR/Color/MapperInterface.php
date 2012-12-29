@@ -3,7 +3,7 @@
  * PHP version 5.4
  *
  * とびだせ どうぶつの森™ マイデザインQRコードジェネレータ
- * プレイヤーエンティティクラス
+ * 入力画像の各ピクセルをカラーコードにマッピングするインターフェイス
  *
  * 「とびだせ どうぶつの森」は任天堂株式会社の登録商標です
  *
@@ -33,35 +33,32 @@
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  */
 
-namespace TobidaseQR\Entity;
+namespace TobidaseQR\Color;
 
-use TobidaseQR\Validator;
+use Imagick;
 
 /**
- * プレイヤーエンティティクラス
+ * 入力画像の各ピクセルにカラーコードを割り当てるインターフェイス
  */
-class Player
+interface MapperInterface
 {
     /**
-     * プレイヤーID (32bit)
+     * コンストラクタ
      *
-     * @var int
+     * @param array $options
      */
-    public $id;
+    public function __construct(array $options = []);
 
     /**
-     * プレイヤー番号 (0-3)
+     * 画像の各ピクセルにカラーコードを割り当てる
      *
-     * @var int
-     */
-    public $number;
-
-    /**
-     * プレイヤー名 (Unicode 1-6文字)
+     * @param Imagick $image
+     * @param TobidaseQR\Color\Table $table
+     * @param array $options
      *
-     * @var string
+     * @return int[][] カラーコードの2次元配列
      */
-    public $name;
+    public function map(Imagick $image, Table $table);
 }
 
 /*

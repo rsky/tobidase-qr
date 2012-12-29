@@ -3,7 +3,7 @@
  * PHP version 5.4
  *
  * とびだせ どうぶつの森™ マイデザインQRコードジェネレータ
- * プレイヤーエンティティクラス
+ * 入力画像の各ピクセルにカラーコードを割り当てる抽象クラス
  *
  * 「とびだせ どうぶつの森」は任天堂株式会社の登録商標です
  *
@@ -33,35 +33,31 @@
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  */
 
-namespace TobidaseQR\Entity;
+namespace TobidaseQR\Color\Mapper;
 
-use TobidaseQR\Validator;
+use TobidaseQR\Color\MapperInterface;
 
 /**
- * プレイヤーエンティティクラス
+ * 入力画像の各ピクセルにカラーコードを割り当てる抽象クラス
  */
-class Player
+abstract class AbstractMapper implements MapperInterface
 {
     /**
-     * プレイヤーID (32bit)
+     * オプション
      *
-     * @var int
+     * @var array
      */
-    public $id;
+    protected $options;
 
     /**
-     * プレイヤー番号 (0-3)
+     * コンストラクタ
      *
-     * @var int
+     * @param array $options
      */
-    public $number;
-
-    /**
-     * プレイヤー名 (Unicode 1-6文字)
-     *
-     * @var string
-     */
-    public $name;
+    public function __construct(array $options = [])
+    {
+        $this->options = $options;
+    }
 }
 
 /*
