@@ -3,7 +3,7 @@
  * PHP version 5.4
  *
  * とびだせ どうぶつの森™ マイデザインQRコードジェネレータ
- * JSON形式にシリアライズ可能な機能を持つトレイト
+ * JSON形式にシリアライズ可能な機能を持つインターフェイス
  *
  * 「とびだせ どうぶつの森」は任天堂株式会社の登録商標です
  *
@@ -36,9 +36,9 @@
 namespace TobidaseQR;
 
 /**
- * JSON形式にシリアライズ可能な機能を持つトレイト
+ * JSON形式にシリアライズ可能な機能を持つインターフェイス
  */
-trait JSONSerialization
+interface JSONSerializable
 {
     /**
      * JSON表現を返す
@@ -47,10 +47,7 @@ trait JSONSerialization
      *
      * @return string
      */
-    public function exportJson($options = 0)
-    {
-        return json_encode(get_object_vars($this), $options);
-    }
+    public function exportJson($options = 0);
 
     /**
      * JSONから値を復元する
@@ -59,17 +56,7 @@ trait JSONSerialization
      *
      * @return void
      */
-    public function importJson($json)
-    {
-        $attributes = json_decode($json, true);
-        if ($attributes) {
-            foreach ($attributes as $attr => $value) {
-                if (property_exists($this, $attr)) {
-                    $this->$attr = $value;
-                }
-            }
-        }
-    }
+    public function importJson($json);
 }
 
 /*

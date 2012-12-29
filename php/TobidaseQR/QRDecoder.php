@@ -405,12 +405,12 @@ class QRDecoder
     {
         $palette = [];
 
-        foreach (array_values(unpack('C15', $data)) as $offset => $code) {
-            $code = $this->decodeColorCode($code);
+        foreach (array_values(unpack('C15', $data)) as $offset => $value) {
+            $code = $this->decodeColorCode($value);
             if ($code === self::INVALID_COLOR_CODE) {
-                $this->offset = $index - 1;
+                $this->offset = $offset;
                 throw new UnexpectedValueException(sprintf(
-                    'Invalid color code 0x%02x', $code
+                    'Invalid color code 0x%02x', $value
                 ), DecoderException::UNEXPECTED_VALUE);
             }
             $palette[] = $code;

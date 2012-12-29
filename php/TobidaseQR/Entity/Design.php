@@ -35,12 +35,13 @@
 
 namespace TobidaseQR\Entity;
 
+use TobidaseQR\JSONSerializable;
 use TobidaseQR\JSONSerialization;
 
 /**
  * デザインエンティティクラス
  */
-class Design
+class Design implements JSONSerializable
 {
     use JSONSerialization;
 

@@ -35,12 +35,13 @@
 
 namespace TobidaseQR\Entity;
 
+use TobidaseQR\JSONSerializable;
 use TobidaseQR\JSONSerialization;
 
 /**
  * プレイヤーエンティティクラス
  */
-class Player
+class Player implements JSONSerializable
 {
     use JSONSerialization;
 

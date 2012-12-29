@@ -35,12 +35,13 @@
 
 namespace TobidaseQR\Entity;
 
+use TobidaseQR\JSONSerializable;
 use TobidaseQR\JSONSerialization;
 
 /**
  * 村エンティティクラス
  */
-class Village
+class Village implements JSONSerializable
 {
     use JSONSerialization;
 

@@ -3,7 +3,7 @@
  * PHP version 5.4
  *
  * とびだせ どうぶつの森™ マイデザインQRコードジェネレータ
- * 拡張属性エンティティクラス
+ * その他のヘッダ情報エンティティクラス
  *
  * 「とびだせ どうぶつの森」は任天堂株式会社の登録商標です
  *
@@ -35,45 +35,56 @@
 
 namespace TobidaseQR\Entity;
 
+use TobidaseQR\JSONSerializable;
 use TobidaseQR\JSONSerialization;
 
 /**
- * 拡張属性エンティティクラス
+ * その他のヘッダ情報エンティティクラス
  */
-class HeaderExtra
+class HeaderExtra implements JSONSerializable
 {
     use JSONSerialization;
 
     /**
-     * マイデザイン名の後に続くデータの16進表記 ("00..")
+     * マイデザイン名の後に続くデータの16進表記
+     *
+     * 期待値は "000000000000000000000000000000000000"
      *
      * @var string
      */
     public $myDesignNamePadding;
 
     /**
-     * プレイヤー名の後に続くデータの16進表記 ("00..")
+     * プレイヤー名の後に続くデータの16進表記
+     *
+     * 期待値は "000000000000"
      *
      * @var string
      */
     public $playerNamePadding;
 
     /**
-     * 村名の後に続くデータの16進表記 ("00..0000")
+     * 村名の後に続くデータの16進表記
+     *
+     * 期待値は "0000000000000000"
      *
      * @var string
      */
     public $villageNamePadding;
 
     /**
-     * パレットの前にある8bitのマジックナンバーその1 (0x01)
+     * パレットの前にある8bitのマジックナンバーその1
+     *
+     * 期待値は 1 (0x01)
      *
      * @var int
      */
     public $magickNumber1;
 
     /**
-     * パレットの前にある8bitのマジックナンバーその2 (0x02)
+     * パレットの前にある8bitのマジックナンバーその2
+     *
+     * 期待値は 2 (0x02)
      *
      * @var string
      */
@@ -87,14 +98,18 @@ class HeaderExtra
     public $paletteExtra;
 
     /**
-     * パレットの後にある8bitのマジックナンバー (0x0a)
+     * パレットの後にある8bitのマジックナンバー
+     *
+     * 期待値は 10 (0x0a)
      *
      * @var int
      */
     public $magickNumberA;
 
     /**
-     * ヘッダの最後にある16bitの終端記号 (0x0000)
+     * ヘッダの最後にある16bitの終端記号
+     *
+     * 期待値は 0 (0x0000)
      *
      * @var int
      */

@@ -35,10 +35,12 @@
 
 namespace TobidaseQR\Entity;
 
+use TobidaseQR\JSONSerializable;
+
 /**
  * マイデザインエンティティクラス
  */
-class MyDesign
+class MyDesign implements JSONSerializable
 {
     /**
      * マイデザイン名
@@ -74,6 +76,64 @@ class MyDesign
      * @var TobidaseQR\Entity\HeaderExtra
      */
     public $headerExtra;
+
+    /**
+     * JSON表現を返す
+     *
+     * @param int $options
+     *
+     * @return string
+     */
+    public function exportJson($options = 0)
+    {
+        return json_encode([
+            'name' => $this->name,
+            'player' => (is_object($this->player))
+                ? get_object_vars($this->player) : null,
+            'village' => (is_object($this->village))
+                ? get_object_vars($this->village) : null,
+            'design' => (is_object($this->design))
+                ? get_object_vars($this->design) : null,
+            'headerExtra' => (is_object($this->headerExtra))
+                ? get_object_vars($this->headerExtra) : null,
+        ], $options);
+    }
+
+    /**
+     * JSONから値を復元する
+     *
+     * @param string $json
+     *
+     * @return void
+     */
+    public function importJson($json)
+    {
+        $attributes = json_decode($json, true);
+        if (!$attributes) {
+            return;
+        }
+
+        foreach ($attributes as $attr => $value) {
+            if (!property_exists($this, $attr)) {
+                continue;
+            }
+
+            if (is_null($value)) {
+                $this->$attr = null;
+                continue;
+            }
+
+            $entityClass = 'TobidaseQR\\Entity\\' . ucfirst($attr);
+            if (class_exists($entityClass)) {
+                if (!$this->$attr) {
+                    $this->$attr = new $entityClass;
+                }
+                $this->$attr->importJson(json_encode($value));
+            } else {
+                $this->$attr = $value;
+            }
+        }
+    }
 }
 
 /*
