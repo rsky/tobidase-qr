@@ -40,6 +40,14 @@ namespace TobidaseQR\Exception;
  */
 class DecoderException extends \RuntimeException
 {
+    /**
+     * エラーコード定数
+     */
+    const WRONG_INPUT = 0;
+    const WRONG_TYPE = 1;
+    const WRONG_STRUCT = 2;
+    const UNEXPECTED_VALUE = 3;
+    const UNEXPECTED_SEQUENCE = 4;
 }
 
 /*

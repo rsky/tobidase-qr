@@ -3,7 +3,7 @@
  * PHP version 5.4
  *
  * とびだせ どうぶつの森™ マイデザインQRコードジェネレータ
- * プレイヤーエンティティクラス
+ * JSON形式にシリアライズ可能な機能を持つトレイト
  *
  * 「とびだせ どうぶつの森」は任天堂株式会社の登録商標です
  *
@@ -35,35 +35,37 @@
 
 namespace TobidaseQR\Entity;
 
-use TobidaseQR\JSONSerialization;
-
 /**
- * プレイヤーエンティティクラス
+ * JSON形式にシリアライズ可能な機能を持つトレイト
  */
-class Player
+trait JSONSerialization
 {
-    use JSONSerialization;
+    public function exportJson()
+    {
+        return json_encode(
+            get_object_vars($this),
+            JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+        );
+    }
 
     /**
-     * プレイヤーID (32bit)
+     * JSONから値を復元する
      *
-     * @var int
-     */
-    public $id;
-
-    /**
-     * プレイヤー番号 (0-3)
+     * @param string $json
      *
-     * @var int
+     * @return void
      */
-    public $number;
-
-    /**
-     * プレイヤー名 (Unicode 1-6文字)
-     *
-     * @var string
-     */
-    public $name;
+    public function importJson($json)
+    {
+        $attributes = json_decode($json, JSON_OBJECT_AS_ARRAY);
+        if ($attributes) {
+            foreach ($attributes as $attr => $value) {
+                if (property_exists($this, $attr)) {
+                    $this->$attr = $value;
+                }
+            }
+        }
+    }
 }
 
 /*

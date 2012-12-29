@@ -50,23 +50,30 @@ class MyDesign
     /**
      * プレイヤー
      *
-     * @var Player
+     * @var TobidaseQR\Entity\Player
      */
     public $player;
 
     /**
      * 村
      *
-     * @var Village
+     * @var TobidaseQR\Entity\Village
      */
     public $village;
 
     /**
      * デザイン
      *
-     * @var Design
+     * @var TobidaseQR\Entity\Design
      */
     public $design;
+
+    /**
+     * 拡張属性
+     *
+     * @var TobidaseQR\Entity\HeaderExtra
+     */
+    public $headerExtra;
 }
 
 /*

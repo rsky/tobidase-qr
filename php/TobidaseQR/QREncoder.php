@@ -119,9 +119,7 @@ class QREncoder
     public function makeData(MyDesign $myDesign)
     {
         $design = $myDesign->design;
-        $data = $this->makeHeader($myDesign)
-            . $this->makePalette($design)
-            . $this->makeBitmap($design);
+        $data = $this->makeHeader($myDesign) . $this->makeBitmap($design);
 
         // 連結QRコードを生成するタイプの場合は
         // バイト数が切りの良い数字になるように
@@ -152,7 +150,8 @@ class QREncoder
         return pack('a40v', $myDesignName, 0)
             . pack('va18v', $player->id, $playerName, $player->number)
             . pack('va18v', $village->id, $villageName, 0)
-            . pack('CC', self::MAGICK_1, self::MAGICK_2);
+            . pack('CC', self::MAGICK_1, self::MAGICK_2)
+            . $this->makePalette($myDesign->design);
     }
 
     /**

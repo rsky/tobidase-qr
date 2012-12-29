@@ -35,13 +35,15 @@
 
 namespace TobidaseQR\Entity;
 
-use TobidaseQR\Validator;
+use TobidaseQR\JSONSerialization;
 
 /**
  * 村エンティティクラス
  */
 class Village
 {
+    use JSONSerialization;
+
     /**
      * 村ID (32bit)
      *

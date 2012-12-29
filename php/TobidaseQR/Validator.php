@@ -36,6 +36,7 @@
 namespace TobidaseQR;
 
 use TobidaseQR\Exception\ValidatorException;
+use TobidaseQR\Entity\Design;
 
 /**
  * バリデータクラス
@@ -104,17 +105,68 @@ class Validator
     public function validateString($value, $maxLength)
     {
         if (mb_detect_encoding($value, 'UTF-8,ISO-8859-1', true) !== 'UTF-8') {
-            throw new ValidatorException('Not a valid UTF-8 string');
+            throw new ValidatorException(
+                'Not a valid UTF-8 string',
+                ValidatorException::INVALID_ENCODING
+            );
         }
+
         if (strlen($value) === 0) {
-            throw new ValidatorException('Empty value');
+            throw new ValidatorException(
+                'Empty value',
+                ValidatorException::INVALID_LENGTH
+            );
         }
+
         if (mb_strlen($value, 'UTF-8') > $maxLength) {
-            throw new ValidatorException('Too long value');
+            throw new ValidatorException(
+                'Too long value',
+                ValidatorException::INVALID_LENGTH
+            );
         }
-        /** @TODO 厳密なホワイトリスト方式にする */
+
+        // @TODO 厳密なホワイトリスト方式にする
         if (preg_match('/[\\0-\\x19\\x7F]/u', $value)) {
-            throw new ValidatorException('Invalid characters found');
+            throw new ValidatorException(
+                'Invalid characters found',
+                ValidatorException::INVALID_SEQUENCE
+            );
+        }
+    }
+
+    /**
+     * デザインタイプを検証する
+     *
+     * @param int $type
+     * @param bool $quad
+     *
+     * @return void
+     *
+     * @throws ValidatorException
+     */
+    public function validateDesignType($type, $quad)
+    {
+        if ($quad) {
+            $validTypes = [
+                Design::TYPE_DRESS_LONG_SLEEEVED,
+                Design::TYPE_DRESS_SHORT_SLEEEVED,
+                Design::TYPE_DRESS_NO_SLEEEVE,
+                Design::TYPE_SHIRT_LONG_SLEEEVED,
+                Design::TYPE_SHIRT_SHORT_SLEEEVED,
+                Design::TYPE_SHIRT_NO_SLEEEVE,
+            ];
+        } else {
+            $validTypes = [
+                Design::TYPE_HAT_KNIT,
+                Design::TYPE_HAT_HORNED,
+                Design::TYPE_GENERIC,
+            ];
+        }
+        if (!in_array($type, $validTypes)) {
+            throw new ValidatorException(
+                "Invalid design type {$type}",
+                ValidatorException::INVALID_VALUE
+            );
         }
     }
 }

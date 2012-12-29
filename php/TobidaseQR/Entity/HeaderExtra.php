@@ -3,7 +3,7 @@
  * PHP version 5.4
  *
  * とびだせ どうぶつの森™ マイデザインQRコードジェネレータ
- * プレイヤーエンティティクラス
+ * 拡張属性エンティティクラス
  *
  * 「とびだせ どうぶつの森」は任天堂株式会社の登録商標です
  *
@@ -38,32 +38,67 @@ namespace TobidaseQR\Entity;
 use TobidaseQR\JSONSerialization;
 
 /**
- * プレイヤーエンティティクラス
+ * 拡張属性エンティティクラス
  */
-class Player
+class HeaderExtra
 {
     use JSONSerialization;
 
     /**
-     * プレイヤーID (32bit)
-     *
-     * @var int
-     */
-    public $id;
-
-    /**
-     * プレイヤー番号 (0-3)
-     *
-     * @var int
-     */
-    public $number;
-
-    /**
-     * プレイヤー名 (Unicode 1-6文字)
+     * マイデザイン名の後に続くデータの16進表記 ("00..")
      *
      * @var string
      */
-    public $name;
+    public $myDesignNamePadding;
+
+    /**
+     * プレイヤー名の後に続くデータの16進表記 ("00..")
+     *
+     * @var string
+     */
+    public $playerNamePadding;
+
+    /**
+     * 村名の後に続くデータの16進表記 ("00..0000")
+     *
+     * @var string
+     */
+    public $villageNamePadding;
+
+    /**
+     * パレットの前にある8bitのマジックナンバーその1 (0x01)
+     *
+     * @var int
+     */
+    public $magickNumber1;
+
+    /**
+     * パレットの前にある8bitのマジックナンバーその2 (0x02)
+     *
+     * @var string
+     */
+    public $magickNumber2;
+
+    /**
+     * パレットの後にある8bitの値
+     *
+     * @var int
+     */
+    public $paletteExtra;
+
+    /**
+     * パレットの後にある8bitのマジックナンバー (0x0a)
+     *
+     * @var int
+     */
+    public $magickNumberA;
+
+    /**
+     * ヘッダの最後にある16bitの終端記号 (0x0000)
+     *
+     * @var int
+     */
+    public $headerTerminator;
 }
 
 /*

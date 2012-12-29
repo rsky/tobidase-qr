@@ -38,8 +38,15 @@ namespace TobidaseQR\Exception;
 /**
  * バリデーション例外クラス
  */
-class ValidatorException extends \InvalidArgumentException
+class ValidatorException extends \RuntimeException
 {
+    /**
+     * エラーコード定数
+     */
+    const INVALID_VALUE = 0;
+    const INVALID_LENGTH = 1;
+    const INVALID_ENCODING = 2;
+    const INVALID_SEQUENCE = 3;
 }
 
 /*
