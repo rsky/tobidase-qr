@@ -79,7 +79,7 @@ class HeaderExtra implements JSONSerializable
      *
      * @var int
      */
-    public $magickNumber1;
+    public $magicNumber1;
 
     /**
      * パレットの前にある8bitのマジックナンバーその2
@@ -88,7 +88,7 @@ class HeaderExtra implements JSONSerializable
      *
      * @var string
      */
-    public $magickNumber2;
+    public $magicNumber2;
 
     /**
      * パレットの後にある8bitの値
@@ -104,7 +104,7 @@ class HeaderExtra implements JSONSerializable
      *
      * @var int
      */
-    public $magickNumberA;
+    public $magicNumberA;
 
     /**
      * ヘッダの最後にある16bitの終端記号
@@ -113,7 +113,7 @@ class HeaderExtra implements JSONSerializable
      *
      * @var int
      */
-    public $headerTerminator;
+    public $terminator;
 }
 
 /*

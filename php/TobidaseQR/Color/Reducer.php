@@ -46,8 +46,8 @@ class Reducer
     /**
      * オプションキー
      */
-    const OPTION_PALETTE_COUNT  = 'paletteCount';
-    const OPTION_KEY_COLOR      = 'keyColor';
+    const OPTION_PALETTE_COUNT = 'paletteCount';
+    const OPTION_KEY_COLOR     = 'keyColor';
 
     /**
      * パレット色数の既定値

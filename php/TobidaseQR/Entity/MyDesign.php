@@ -86,16 +86,22 @@ class MyDesign implements JSONSerializable
      */
     public function exportJson($options = 0)
     {
+        $childOptions = $options & ~JSON_PRETTY_PRINT;
+
         return json_encode([
             'name' => $this->name,
             'player' => (is_object($this->player))
-                ? get_object_vars($this->player) : null,
+                ? $this->player->exportJson($childOptions)
+                : null,
             'village' => (is_object($this->village))
-                ? get_object_vars($this->village) : null,
+                ? $this->village->exportJson($childOptions)
+                : null,
             'design' => (is_object($this->design))
-                ? get_object_vars($this->design) : null,
+                ? $this->design->exportJson($childOptions)
+                : null,
             'headerExtra' => (is_object($this->headerExtra))
-                ? get_object_vars($this->headerExtra) : null,
+                ? $this->headerExtra->exportJson($childOptions)
+                : null,
         ], $options);
     }
 
@@ -128,7 +134,7 @@ class MyDesign implements JSONSerializable
                 if (!$this->$attr) {
                     $this->$attr = new $entityClass;
                 }
-                $this->$attr->importJson(json_encode($value));
+                $this->$attr->importJson($value);
             } else {
                 $this->$attr = $value;
             }

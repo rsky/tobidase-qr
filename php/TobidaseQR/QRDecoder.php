@@ -240,7 +240,7 @@ class QRDecoder
         $myDesign->player  = new Player;
         $myDesign->village = new Village;
         $myDesign->design  = new Design;
-        $myDesign->headerExtra = new HeaderExtra;
+        $headerExtra = new HeaderExtra;
 
         $format = implode('/', [
             'A24' . 'myDesignName',
@@ -252,12 +252,12 @@ class QRDecoder
             'v'   . 'villageId',
             'A12' . 'villageName',
             'A8'  . 'villageNamePadding',
-            'C2'  . 'magick',
+            'C2'  . 'magicNumber',
             'A15' . 'palette',
             'C'   . 'paletteExtra',
-            'C'   . 'magickA',
+            'C'   . 'magicNumberA',
             'C'   . 'designType',
-            'v'   . 'headerTerminator',
+            'v'   . 'terminator',
         ]);
 
         $values = unpack($format, $data);
@@ -268,10 +268,6 @@ class QRDecoder
         // デコードと検証が必要な値を処理
         try {
             $this->offset = 0;
-
-            $offset = self::DESIGN_TYPE_OFFSET;
-            $this->validator->validateDesignType($values['designType'], $quad);
-            $myDesign->design->type = $values['designType'];
 
             $offset = self::MYDESIGN_NAME_OFFSET;
             $name = $this->decodeMyDesignName($values['myDesignName']);
@@ -288,6 +284,11 @@ class QRDecoder
             $offset = self::DESIGN_PALETTE_OFFSET;
             $palette = $this->decodePalette($values['palette']);
             $myDesign->design->palette = $palette;
+
+            $offset = self::DESIGN_TYPE_OFFSET;
+            $type = $values['designType'];
+            $this->validator->validateDesignType($type, $quad);
+            $myDesign->design->type = $type;
         } catch (UnexpectedValueException $e) {
             $this->offset += $offset;
             throw $e;
@@ -295,25 +296,27 @@ class QRDecoder
 
         // マイデザイン
         $padding = bin2hex($values['myDesignNamePadding']);
-        $myDesign->headerExtra->myDesignNamePadding = $padding;
+        $headerExtra->myDesignNamePadding = $padding;
 
         // プレイヤー情報
         $myDesign->player->id = $values['playerId'];
         $padding = bin2hex($values['playerNamePadding']);
-        $myDesign->headerExtra->playerNamePadding =  $padding;
+        $headerExtra->playerNamePadding = $padding;
         $myDesign->player->number = $values['playerNumber'];
 
         // 村情報
         $myDesign->village->id = $values['villageId'];
         $padding = bin2hex($values['villageNamePadding']);
-        $myDesign->headerExtra->villageNamePadding = $padding;
+        $headerExtra->villageNamePadding = $padding;
 
         // その他のヘッダフィールド
-        $myDesign->headerExtra->magickNumber1    = $values['magick1'];
-        $myDesign->headerExtra->magickNumber2    = $values['magick2'];
-        $myDesign->headerExtra->paletteExtra     = $values['paletteExtra'];
-        $myDesign->headerExtra->magickNumberA    = $values['magickA'];
-        $myDesign->headerExtra->headerTerminator = $values['headerTerminator'];
+        $headerExtra->magicNumber1 = $values['magicNumber1'];
+        $headerExtra->magicNumber2 = $values['magicNumber2'];
+        $headerExtra->paletteExtra = $values['paletteExtra'];
+        $headerExtra->magicNumberA = $values['magicNumberA'];
+        $headerExtra->terminator   = $values['terminator'];
+
+        $myDesign->headerExtra = $headerExtra;
 
         return $myDesign;
     }
@@ -329,7 +332,7 @@ class QRDecoder
      */
     public function decodeMyDesignName($name)
     {
-        $name = rtrim($this->decodeString($name), "\0");
+        $name = $this->decodeString($name);
         $this->validator->validateMyDesignName($name);
 
         return $name;
@@ -346,7 +349,7 @@ class QRDecoder
      */
     public function decodePlayerName($name)
     {
-        $name = rtrim($this->decodeString($name), "\0");
+        $name = $this->decodeString($name);
         $this->validator->validatePlayerName($name);
 
         return $name;
@@ -363,7 +366,7 @@ class QRDecoder
      */
     public function decodeVillageName($name)
     {
-        $name = rtrim($this->decodeString($name), "\0");
+        $name = $this->decodeString($name);
         $this->validator->validateVillageName($name);
 
         return $name;
@@ -376,13 +379,22 @@ class QRDecoder
      *
      * @return int[]
      *
-     * @throws UnexpectedValueException
+     * @throws TobidaseQR\Exception\DecoderException,
+     *         UnexpectedValueException
      */
     public function decodePalette($data)
     {
+        $rawPalette = array_values(unpack('C15', $data));
+        if (!$rawPalette) {
+            throw new DecoderException(
+                'Failed to decode palette',
+                DecoderException::UNEXPECTED_SEQUENCE
+            );
+        }
+
         $palette = [];
 
-        foreach (array_values(unpack('C15', $data)) as $offset => $value) {
+        foreach ($rawPalette as $offset => $value) {
             $code = $this->decodeColorCode($value);
             if ($code === self::INVALID_COLOR_CODE) {
                 $this->offset = $offset;
@@ -452,13 +464,15 @@ class QRDecoder
     /**
      * UCS-2LE文字列をUTF-8文字列に変換する
      *
+     * デコード結果末尾のヌルバイトは消去して返す
+     *
      * @param string $str
      *
      * @return string
      */
     private function decodeString($str)
     {
-        return mb_convert_encoding($str, 'UTF-8', 'UCS-2LE');
+        return rtrim(mb_convert_encoding($str, 'UTF-8', 'UCS-2LE'), "\0");
     }
 
     /**

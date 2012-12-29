@@ -45,7 +45,7 @@ class Mapper implements MapperInterface
     /**
      * オプションキー
      */
-    const OPTION_DITHERING  = 'dithering';
+    const OPTION_DITHERING = 'dithering';
 
     /**
      * 実際に色の割当を行うクラス
