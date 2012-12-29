@@ -1,0 +1,10 @@
+### /Users/rsk/.gitignore-boilerplates/Java.gitignore
+
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+
