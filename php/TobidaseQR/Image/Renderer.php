@@ -39,11 +39,13 @@ use TobidaseQR\Color\Table;
 use TobidaseQR\Entity\Design;
 use TobidaseQR\Entity\MyDesign;
 use Imagick;
+use ImagickDraw;
+use InvalidArgumentException;
 
 /**
  * 画像を描画するクラス
  */
-class Render
+class Renderer
 {
     /**
      * カラーテーブル
@@ -67,38 +69,112 @@ class Render
      *
      * @param int[][] $bitmap
      * @param int[] $palette
-     * @param int $magnify
+     * @param int $scale
+     *
+     * @return Imagick
+     *
+     * @throws InvalidArgumentException
+     */
+    public function renderBitmap(array $bitmap, array $palette, $scale = 1)
+    {
+        switch (count($bitmap)) {
+            case 32:
+                $image = $this->renderSingleBitmap($bitmap, $palette, $scale);
+                break;
+            case 128:
+                $image = $this->renderQuadBitmap($bitmap, $palette, $scale);
+                break;
+            default:
+                throw new InvalidArgumentException('Invalid bitmap data');
+        }
+
+        if ($scale > 1) {
+            $image->scaleImage(
+                $image->getImageWidth() * $scale,
+                $image->getImageHeight() * $scale
+            );
+        }
+
+        return $image;
+    }
+
+    /**
+     * 32x32ピクセルのビットマップデータをImagickオブジェクトに描画する
+     *
+     * @param int[][] $bitmap
+     * @param int[] $palette
      *
      * @return Imagick
      */
-    public function renderBitmap(array $bitmap, array $palette, $magnify = 1)
+    private function renderSingleBitmap(array $bitmap, array $palette)
     {
+        $context = new RenderContext($palette, $this->table);
+
+        for ($y = 0; $y < RenderContext::HEIGHT; $y++) {
+            for ($x = 0; $x < RenderContext::WIDTH; $x++) {
+                $context->drawPixel($x, $y, $bitmap[$y][$x]);
+            }
+        }
+
+        return $context->getImage();
+    }
+
+    /**
+     * 32x32ピクセルx4のビットマップデータをImagickオブジェクトに描画する
+     *
+     * @param int[][] $bitmap
+     * @param int[] $palette
+     *
+     * @return Imagick
+     */
+    private function renderQuadBitmap(array $bitmap, array $palette)
+    {
+        $image = new Imagick;
+        $image->newImage(
+            RenderContext::WIDTH * 2,
+            RenderContext::HEIGHT * 2,
+            vsprintf("#%02x%02x%02x", $this->table->getRgbColor($palette[0]))
+        );
+
+        $offsets = [[0, 0], [1, 0], [0, 1], [1, 1]];
+
+        foreach ($offsets as $serial => $offset) {
+            $chunk = array_slice($bitmap, 32 * $serial, 32);
+            $image->compositeImage(
+                $this->renderSingleBitmap($chunk, $palette, 1),
+                Imagick::COMPOSITE_OVER,
+                RenderContext::WIDTH * $offset[0],
+                RenderContext::HEIGHT * $offset[1]
+            );
+        }
+
+        return $image;
     }
 
     /**
      * デザインオブジェクトをImagickオブジェクトに描画する
      *
      * @param TobidaseQR\Entity\Design $design
-     * @param int $magnify
+     * @param int $scale
      *
      * @return Imagick
      */
-    public function renderDesign(Design $design, $magnify = 1)
+    public function renderDesign(Design $design, $scale = 1)
     {
-        return $this->renderBitmap($design->bitmap, $design->palette, $magnify);
+        return $this->renderBitmap($design->bitmap, $design->palette, $scale);
     }
 
     /**
      * マイデザインオブジェクトをImagickオブジェクトに描画する
      *
      * @param TobidaseQR\Entity\MyDesign $myDesign
-     * @param int $magnify
+     * @param int $scale
      *
      * @return Imagick
      */
-    public function renderMyDesign(MyDesign $myDesign, $magnify = 1)
+    public function renderMyDesign(MyDesign $myDesign, $scale = 1)
     {
-        return $this->renderDesign($myDesign->design, $magnify);
+        return $this->renderDesign($myDesign->design, $scale);
     }
 }
 
