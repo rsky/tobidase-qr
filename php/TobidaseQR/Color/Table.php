@@ -277,11 +277,39 @@ class Table
      *
      * @see self::checkColorCode()
      */
-    public function getRgbColor($code)
+    public function getRgbComponents($code)
     {
         $this->checkColorCode($code);
 
         return $this->rgbColorTable[$code];
+    }
+
+    /**
+     * カラーコードに対応するRGBColorオブジェクトを返す
+     *
+     * @param int $code
+     *
+     * @return TobidaseQR\Color\RGBColor
+     *
+     * @see self::getRgbComponents()
+     */
+    public function getRgbColor($code)
+    {
+        return new RGBColor($code, $this->getRgbComponents($code));
+    }
+
+    /**
+     * カラーコードに対応するImagickPixelオブジェクトを返す
+     *
+     * @param int $code
+     *
+     * @return ImagickPixel
+     *
+     * @see self::getRgbColor()
+     */
+    public function getRgbPixel($code)
+    {
+        return $this->getRgbColor($code)->toImagickPixel();
     }
 
     /**
@@ -293,7 +321,7 @@ class Table
      *
      * @see self::checkColorCode()
      */
-    public function getLabColor($code)
+    public function getLabComponents($code)
     {
         $this->checkColorCode($code);
 

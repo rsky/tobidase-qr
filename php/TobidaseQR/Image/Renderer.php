@@ -132,7 +132,7 @@ class Renderer
         $image->newImage(
             RenderContext::WIDTH * 2,
             RenderContext::HEIGHT * 2,
-            vsprintf("#%02x%02x%02x", $this->table->getRgbColor($palette[0]))
+            $this->table->getRgbPixel($palette[0])
         );
 
         $offsets = [[0, 0], [1, 0], [0, 1], [1, 1]];

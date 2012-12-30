@@ -35,6 +35,8 @@
 
 namespace TobidaseQR\Color;
 
+use ImagickPixel;
+
 /**
  * RGB色情報クラス
  */
@@ -86,6 +88,20 @@ class RGBColor
         $this->b = $b;
         $this->frequency = $frequency;
         $this->cmpValue = ($g << 16) | ($r << 8) | $b;
+    }
+
+    /**
+     * RGB値からImagickPixelオブジェクトを作成する
+     *
+     * @param void
+     *
+     * @return ImagickPixel
+     */
+    public function toImagickPixel()
+    {
+        return new ImagickPixel(
+            sprintf('#%02x%02x%02x', $this->r, $this->g, $this->b)
+        );
     }
 }
 

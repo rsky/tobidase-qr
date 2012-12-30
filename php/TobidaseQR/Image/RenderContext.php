@@ -87,9 +87,7 @@ class RenderContext
         $colors = [];
 
         foreach ($palette as $code) {
-            $colors[] = new ImagickPixel(vsprintf(
-                '#%02x%02x%02x', $table->getRgbColor($code)
-            ));
+            $colors[] = $table->getRgbPixel($code);
         }
 
         $this->image = new Imagick;
