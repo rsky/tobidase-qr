@@ -35,10 +35,6 @@
 
 namespace TobidaseQR;
 
-if (!function_exists('TobidaseQR\\rgbToLab')) {
-    require __DIR__ . '/../utility.php';
-}
-
 /**
  * 色情報クラス
  */
@@ -90,25 +86,6 @@ class Color
         $this->b = $b;
         $this->frequency = $frequency;
         $this->cmpValue = ($g << 16) | ($r << 8) | $b;
-    }
-
-    /**
-     * CIE RGB表色系をCIE L*a*b*表色系に変換する
-     *
-     * RGBの色空間はsRGBで光源はD65、
-     * L*a*b*の光源はD50として変換を行う
-     *
-     * @param int $r 赤色成分 [0..255]
-     * @param int $g 緑色成分 [0..255]
-     * @param int $b 青色成分 [0..255]
-     *
-     * @return float[] ($L, $a, $b)
-     *
-     * @see TobidaseQR\rgbToLab()
-     */
-    public static function rgbToLab($r, $g, $b)
-    {
-        return rgbToLab($r, $g, $b);
     }
 }
 

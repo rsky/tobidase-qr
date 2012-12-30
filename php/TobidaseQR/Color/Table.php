@@ -35,7 +35,6 @@
 
 namespace TobidaseQR\Color;
 
-use TobidaseQR\Color;
 use Imagick;
 use InvalidArgumentException;
 use OutOfBoundsException;
@@ -109,7 +108,7 @@ class Table
         [255, 255, 255], [239, 239, 239], [222, 223, 222], [206, 207, 206],
         [189, 186, 189], [173, 170, 173], [156, 154, 156], [140, 138, 140],
         [115, 117, 115], [ 99, 101,  99], [ 82,  85,  82], [ 66,  69,  66],
-        [ 49,  48,  49], [ 33,  32,  33], [  0,   0,   0],
+        [ 49,  48,  49], [ 33,  32,  33], [  0,   0,   0]
     ];
 
     /**
@@ -197,7 +196,7 @@ class Table
         [  73.3246, -0.701194,  0.530231], [  69.0298, -0.774041,  0.585469],
         [  64.1611,  -1.30857,  0.991272], [  58.7196,  -1.50746,   1.14285],
         [  50.6105,  0.627948, -0.473159], [  42.2465,  0.820354, -0.617552],
-        [        0,         0,         0],
+        [        0,         0,         0]
     ];
 
     /**
@@ -213,7 +212,7 @@ class Table
 
             foreach ($rgbTable as $code => $rgb) {
                 list($r, $g, $b) = $rgb;
-                $this->labColorTable[$code] = Color::rgbToLab($r, $g, $b);
+                $this->labColorTable[$code] = Utility::rgbToLab($r, $g, $b);
             }
         }
     }
@@ -399,7 +398,7 @@ class Table
      */
     public function nearestColorCodeByRgbUsingLabDistance($r, $g, $b)
     {
-        list($L, $A, $B) = Color::rgbToLab($r, $g, $b);
+        list($L, $A, $B) = Utility::rgbToLab($r, $g, $b);
 
         try {
             return $this->nearestColorCodeByLab($L, $A, $B);
