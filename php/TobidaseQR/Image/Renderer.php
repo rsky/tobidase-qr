@@ -140,7 +140,7 @@ class Renderer
         foreach ($offsets as $serial => $offset) {
             $chunk = array_slice($bitmap, 32 * $serial, 32);
             $image->compositeImage(
-                $this->renderSingleBitmap($chunk, $palette, 1),
+                $this->renderSingleBitmap($chunk, $palette),
                 Imagick::COMPOSITE_OVER,
                 RenderContext::WIDTH * $offset[0],
                 RenderContext::HEIGHT * $offset[1]
