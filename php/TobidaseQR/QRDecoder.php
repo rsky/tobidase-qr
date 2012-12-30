@@ -158,7 +158,7 @@ class QRDecoder
      */
     public function decodeHexString($hex)
     {
-        if (preg_match('/[^0-9A-Fa-f\\s]/u', $hex, $matches, OFFSET_PREG_CAPTURE)) {
+        if (preg_match('/[^0-9A-Fa-f\\s]/u', $hex, $matches, PREG_OFFSET_CAPTURE)) {
             $char = bin2hex($matches[0][0]);
             $offset = $matches[0][1];
             throw new DecoderException(
