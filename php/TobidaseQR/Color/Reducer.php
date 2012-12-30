@@ -35,7 +35,6 @@
 
 namespace TobidaseQR\Color;
 
-use TobidaseQR\Color;
 use InvalidArgumentException;
 
 /**
@@ -171,7 +170,7 @@ class Reducer
         // メディアンカット法で必要な数まで分割する
         $colors = [];
         foreach ($remains as $code) {
-            $colors[$code] = new Color(
+            $colors[$code] = new RGBColor(
                 $code, $this->table[$code], $histgram[$code]
             );
         }

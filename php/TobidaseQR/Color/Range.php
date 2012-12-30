@@ -65,14 +65,14 @@ class Range
     /**
      * 内包する色
      *
-     * @param TobidaseQR\Color[]
+     * @param TobidaseQR\Color\RGBColor[]
      */
     private $colors;
 
     /**
      * コンストラクタ
      *
-     * @param TobidaseQR\Color[] $colors
+     * @param TobidaseQR\Color\RGBColor[] $colors
      */
     public function __construct(array $colors)
     {
@@ -182,7 +182,7 @@ class Range
      *
      * @param void
      *
-     * @return TobidaseQR\Color
+     * @return TobidaseQR\Color\RGBColor
      */
     public function getMostSignificantColor()
     {

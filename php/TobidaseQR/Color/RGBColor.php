@@ -3,7 +3,7 @@
  * PHP version 5.4
  *
  * とびだせ どうぶつの森™ マイデザインQRコードジェネレータ
- * 色範囲の各要素クラス
+ * RGB色情報クラス
  *
  * 「とびだせ どうぶつの森」は任天堂株式会社の登録商標です
  *
@@ -33,12 +33,12 @@
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  */
 
-namespace TobidaseQR;
+namespace TobidaseQR\Color;
 
 /**
- * 色情報クラス
+ * RGB色情報クラス
  */
-class Color
+class RGBColor
 {
     /**
      * カラーコード
