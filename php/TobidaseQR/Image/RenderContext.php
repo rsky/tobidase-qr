@@ -107,6 +107,10 @@ class RenderContext
      */
     public function drawPixel($x, $y, $color)
     {
+        // 省力化のため0番=背景色のピクセルは描画しない。
+        // よって0番だけ上書きできない仕様となっている。
+        // ビットマップをシーケンシャルに1ピクセルずつ
+        // 描画するためのクラスなのでそれでよしとしている。
         if ($color > 0) {
             $this->draw->setFillColor($this->colors[$color]);
             $this->draw->point($x, $y);
