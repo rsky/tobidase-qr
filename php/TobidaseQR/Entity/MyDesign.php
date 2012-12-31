@@ -78,6 +78,22 @@ class MyDesign implements JSONSerializable
     public $headerExtra;
 
     /**
+     * (non-PHPdoc)
+     */
+    public function serialize()
+    {
+        return $this->exportJson();
+    }
+
+    /**
+     * (non-PHPdoc)
+     */
+    public function unserialize($data)
+    {
+        $this->importJson($data);
+    }
+
+    /**
      * JSON表現を返す
      *
      * @param int $options
@@ -124,8 +140,8 @@ class MyDesign implements JSONSerializable
                 continue;
             }
 
-            if (is_null($value)) {
-                $this->$attr = null;
+            if ($attr === 'name' || is_null($value)) {
+                $this->$attr = $value;
                 continue;
             }
 

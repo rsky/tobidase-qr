@@ -41,6 +41,22 @@ namespace TobidaseQR;
 trait JSONSerialization
 {
     /**
+     * (non-PHPdoc)
+     */
+    public function serialize()
+    {
+        return $this->exportJson();
+    }
+
+    /**
+     * (non-PHPdoc)
+     */
+    public function unserialize($data)
+    {
+        $this->importJson($data);
+    }
+
+    /**
      * JSON表現を返す
      *
      * @param int $options

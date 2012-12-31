@@ -38,7 +38,7 @@ namespace TobidaseQR;
 /**
  * JSON形式にシリアライズ可能な機能を持つインターフェイス
  */
-interface JSONSerializable
+interface JSONSerializable extends \Serializable
 {
     /**
      * JSON表現を返す
