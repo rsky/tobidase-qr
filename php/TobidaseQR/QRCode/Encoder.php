@@ -33,7 +33,7 @@
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  */
 
-namespace TobidaseQR;
+namespace TobidaseQR\QRCode;
 
 use TobidaseQR\Entity\Design;
 use TobidaseQR\Entity\MyDesign;

@@ -33,7 +33,7 @@
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  */
 
-namespace TobidaseQR;
+namespace TobidaseQR\QRCode;
 
 use TobidaseQR\Entity\Design;
 use TobidaseQR\Entity\HeaderExtra;
@@ -41,6 +41,7 @@ use TobidaseQR\Entity\MyDesign;
 use TobidaseQR\Entity\Player;
 use TobidaseQR\Entity\Village;
 use TobidaseQR\Exception\DecoderException;
+use TobidaseQR\Validator;
 use Imagick;
 use UnexpectedValueException;
 
@@ -49,7 +50,7 @@ use UnexpectedValueException;
  *
  * 別のプログラムで解析済の生データのデコードのみを行う
  */
-class QRDecoder
+class Decoder
 {
     /**
      * データサイズ定数
