@@ -35,6 +35,7 @@
 
 namespace TobidaseQR\Image;
 
+use TobidaseQR\Common\ColorMapping;
 use Imagick;
 
 /**
@@ -42,6 +43,68 @@ use Imagick;
  */
 class Loader
 {
+    use ColorMapping;
+
+    /**
+     * オプションキー
+     */
+    const OPTION_RESIZE_FILTER = 'resizeFilter';
+    const OPTION_RESIZE_BLUR   = 'resizeBlur';
+    const OPTION_COLOR_MAPPER  = 'colorMapper';
+    const OPTION_COLOR_TABLE   = 'colorTable';
+
+    /**
+     * リサイズで使う窓関数の既定値
+     */
+    const DEFAULT_RESIZE_FILTER = Imagick::FILTER_LANCZOS;
+
+    /**
+     * リサイズのぼけ具合の既定値
+     */
+    const DEFAULT_RESIZE_BLUR = 0.75;
+
+    /**
+     * リサイズで使う窓関数
+     *
+     * @var int
+     */
+    private $filter;
+
+    /**
+     * リサイズのぼけ具合
+     *
+     * @var float
+     */
+    private $blur;
+
+    /**
+     * コンストラクタ
+     *
+     * @param array $options
+     */
+    public function __construct(array $options = [])
+    {
+        $this->filter = (isset($options[self::OPTION_RESIZE_FILTER]))
+            ? (int)$options[self::OPTION_RESIZE_FILTER]
+            : self::DEFAULT_RESIZE_FILTER;
+
+        $this->blur = (isset($options[self::OPTION_RESIZE_BLUR]))
+            ? (float)$options[self::OPTION_RESIZE_BLUR]
+            : self::DEFAULT_RESIZE_BLUR;
+
+        if (isset($options[self::OPTION_COLOR_MAPPER])) {
+            $this->setColorMapper($options[self::OPTION_COLOR_MAPPER]);
+        } else {
+            $this->setStandardColorMapper();
+        }
+
+        if (isset($options[self::OPTION_COLOR_TABLE])) {
+            $this->setColorTable($options[self::OPTION_COLOR_TABLE]);
+        } else {
+            $this->setStandardColorTable();
+        }
+    }
+
     /**
      * 画像を読み込む
      *
@@ -51,7 +114,7 @@ class Loader
      *
      * @return Imagick
      */
-    public function load($source, $width, $height)
+    public function loadImage($source, $width, $height)
     {
         if ($source instanceof Imagick) {
             $image = clone $source;
@@ -63,6 +126,22 @@ class Loader
         $this->resizeImage($image, $width, $height);
 
         return $image;
+    }
+
+    /**
+     * 画像を読み込み、カラーテーブルの色を割り当てたビットマップを返す
+     *
+     * @param mixed $source Imagickオブジェクトもしくは画像ファイルのパス
+     * @param int $width
+     * @param int $height
+     *
+     * @return int[][]
+     */
+    public function loadImageAsBitmap($source, $width, $height)
+    {
+        $image = $this->loadImage($bitmap, $width, $height);
+
+        return $this->mapper->map($image, $this->table);
     }
 
     /**
@@ -110,7 +189,7 @@ class Loader
                 $ratio = $tmpWidth / $srcWidth;
             }
 
-            if (0.75 < $ratio && $ratio < 1.25) {
+            if (0.875 < $ratio && $ratio < 1.125) {
                 $image->adaptiveResizeImage($tmpWidth, $tmpHeight, true);
             } else {
                 $image->resizeImage(

@@ -3,7 +3,7 @@
  * PHP version 5.4
  *
  * とびだせ どうぶつの森™ マイデザインQRコードジェネレータ
- * デザインエンティティクラス
+ * 画像の読み込み機能を持つトレイト
  *
  * 「とびだせ どうぶつの森」は任天堂株式会社の登録商標です
  *
@@ -33,57 +33,73 @@
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  */
 
-namespace TobidaseQR\Entity;
+namespace TobidaseQR\Common;
 
-use TobidaseQR\Common\JSONSerializable;
-use TobidaseQR\Common\JSONSerialization;
+use TobidaseQR\Image\Loader;
 
 /**
- * デザインエンティティクラス
+ * 画像の読み込み機能を持つトレイト
  */
-class Design implements JSONSerializable
+trait ImageLoading
 {
-    use JSONSerialization;
-
     /**
-     * デザインタイプ定数
-     */
-    // ワンピース（長袖、半袖、ノースリーブ）
-    const TYPE_DRESS_LONG_SLEEEVED  = 0;
-    const TYPE_DRESS_SHORT_SLEEEVED = 1;
-    const TYPE_DRESS_NO_SLEEEVE     = 2;
-    // Tシャツ（長袖、半袖、ノースリーブ）
-    const TYPE_SHIRT_LONG_SLEEEVED  = 3;
-    const TYPE_SHIRT_SHORT_SLEEEVED = 4;
-    const TYPE_SHIRT_NO_SLEEEVE     = 5;
-    // 帽子（ニット帽、つの帽子）
-    const TYPE_HAT_KNIT   = 6;
-    const TYPE_HAT_HORNED = 7;
-    // 不明
-    const TYPE_UNKNOWN = 8;
-    // 一般
-    const TYPE_GENERIC = 9;
-
-    /**
-     * デザインタイプ
+     * 画像ローダーオブジェクト
      *
-     * @var int
+     * @var TobidaseQR\Image\Loader
      */
-    public $type;
+    protected $loader;
 
     /**
-     * カラーパレット
+     * 連想配列のオプションからオブジェクトをセットする
      *
-     * @var int[]
+     * @param array $options
+     *
+     * @return void
      */
-    public $palette;
+    public function setImageLoadingOptions(array $options = [])
+    {
+        if (isset($options[OptionKey::IMAGE_LOADER])) {
+            $this->setImageLoader($options[OptionKey::IMAGE_LOADER]);
+        } else {
+            $this->setStandardImageLoader();
+        }
+    }
 
     /**
-     * ビットマップデータ
+     * 画像ローダーを返す
      *
-     * @var int[][]
+     * @param void
+     *
+     * @return TobidaseQR\Image\Loader $loader
      */
-    public $bitmap;
+    public function getImageLoader()
+    {
+        return $this->loader;
+    }
+
+    /**
+     * 画像ローダーをセットする
+     *
+     * @param TobidaseQR\Image\Loader $loader
+     *
+     * @return void
+     */
+    public function setImageLoader(Loader $loader)
+    {
+        $this->loader = $loader;
+    }
+
+    /**
+     * 標準の画像ローダーをセットする
+     *
+     * @param void
+     *
+     * @return void
+     */
+    public function setStandardImageLoader()
+    {
+        $this->loader = new Loader;
+    }
 }
 
 /*

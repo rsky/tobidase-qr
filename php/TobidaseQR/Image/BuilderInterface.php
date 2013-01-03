@@ -1,17 +1,68 @@
 <?php
+/**
+ * PHP version 5.4
+ *
+ * とびだせ どうぶつの森™ マイデザインQRコードジェネレータ
+ * 任意の画像をQRコード用に変換するインターフェイス
+ *
+ * 「とびだせ どうぶつの森」は任天堂株式会社の登録商標です
+ *
+ * Copyright (c) 2012 Ryusuke SEKIYAMA <rsky0711@gmail.com>,
+ * All rights reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ *
+ * @package     TobidaseQR
+ * @copyright   2012 Ryusuke SEKIYAMA <rsky0711@gmail.com>
+ * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
+ */
+
 namespace TobidaseQR\Image;
 
+use TobidaseQR\Color\Mapper;
+
+/**
+ * 任意の画像をQRコード用に変換するインターフェイス
+ */
 interface BuilderInterface
 {
-    public function __construt(Loader $loader, array $options = []);
+    /**
+     * コンストラクタ
+     *
+     * @param array $options
+     */
+    public function __construt(array $options = []);
 
+    /**
+     * ヒストグラムを得る
+     *
+     * @param void
+     *
+     * @return array
+     */
     public function getHistgram();
 
     public function getPalette();
 
-    public function getEncodedData();
+    public function getBitmap();
 
-    public function getImage($image);
+    public function getImage();
 
     public function setImage($image);
 }

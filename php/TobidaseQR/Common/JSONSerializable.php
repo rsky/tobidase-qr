@@ -3,7 +3,7 @@
  * PHP version 5.4
  *
  * とびだせ どうぶつの森™ マイデザインQRコードジェネレータ
- * デザインエンティティクラス
+ * JSON形式にシリアライズ可能な機能を持つインターフェイス
  *
  * 「とびだせ どうぶつの森」は任天堂株式会社の登録商標です
  *
@@ -33,57 +33,30 @@
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  */
 
-namespace TobidaseQR\Entity;
-
-use TobidaseQR\Common\JSONSerializable;
-use TobidaseQR\Common\JSONSerialization;
+namespace TobidaseQR\Common;
 
 /**
- * デザインエンティティクラス
+ * JSON形式にシリアライズ可能な機能を持つインターフェイス
  */
-class Design implements JSONSerializable
+interface JSONSerializable extends \Serializable
 {
-    use JSONSerialization;
-
     /**
-     * デザインタイプ定数
-     */
-    // ワンピース（長袖、半袖、ノースリーブ）
-    const TYPE_DRESS_LONG_SLEEEVED  = 0;
-    const TYPE_DRESS_SHORT_SLEEEVED = 1;
-    const TYPE_DRESS_NO_SLEEEVE     = 2;
-    // Tシャツ（長袖、半袖、ノースリーブ）
-    const TYPE_SHIRT_LONG_SLEEEVED  = 3;
-    const TYPE_SHIRT_SHORT_SLEEEVED = 4;
-    const TYPE_SHIRT_NO_SLEEEVE     = 5;
-    // 帽子（ニット帽、つの帽子）
-    const TYPE_HAT_KNIT   = 6;
-    const TYPE_HAT_HORNED = 7;
-    // 不明
-    const TYPE_UNKNOWN = 8;
-    // 一般
-    const TYPE_GENERIC = 9;
-
-    /**
-     * デザインタイプ
+     * JSON表現を返す
      *
-     * @var int
+     * @param int $options
+     *
+     * @return string
      */
-    public $type;
+    public function exportJson($options = 0);
 
     /**
-     * カラーパレット
+     * JSONから値を復元する
      *
-     * @var int[]
-     */
-    public $palette;
-
-    /**
-     * ビットマップデータ
+     * @param string $json
      *
-     * @var int[][]
+     * @return void
      */
-    public $bitmap;
+    public function importJson($json);
 }
 
 /*

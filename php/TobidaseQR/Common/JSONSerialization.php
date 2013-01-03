@@ -33,7 +33,7 @@
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  */
 
-namespace TobidaseQR;
+namespace TobidaseQR\Common;
 
 /**
  * JSON形式にシリアライズ可能な機能を持つトレイト

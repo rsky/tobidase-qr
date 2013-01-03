@@ -35,7 +35,7 @@
 
 namespace TobidaseQR\Entity;
 
-use TobidaseQR\JSONSerializable;
+use TobidaseQR\Common\JSONSerializable;
 
 /**
  * マイデザインエンティティクラス

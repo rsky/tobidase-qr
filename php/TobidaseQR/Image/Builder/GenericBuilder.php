@@ -16,7 +16,7 @@ class GenericBuilder extends AbstractBuilder
     {
     }
 
-    public function getEncodedData()
+    public function getBitmap()
     {
     }
 

@@ -2,40 +2,27 @@
 namespace TobidaseQR\Image\Builder;
 
 use TobidaseQR\Image\BuilderInterface;
-use TobidaseQR\Image\Loader;
+use TobidaseQR\Common\ColorMapping;
+use TobidaseQR\Common\ColorReduction;
+use TobidaseQR\Common\ImageLoading;
 use Imagick;
 
 abstract class AbstractBuilder implements BuilderInterface
 {
-    const OPTION_RESIZE_FILTER = 'resizeFilter';
-    const OPTION_RESIZE_BLUR   = 'resizeBlur';
+    use ColorMapping;
+    use ColorReduction;
+    use ImageLoading;
 
     /**
-     * @var TobidaseQR\Image\Loader
+     * コンストラクタ
+     *
+     * @param array $options
      */
-    protected $loader;
-
-    /**
-     * @var int
-     */
-    private $filter;
-
-    /**
-     * @var float
-     */
-    private $blur;
-
-    public function __construct(Loader $loader, array $options = [])
+    public function __construct(array $options = [])
     {
-        $this->loader = $loader;
-
-        $this->filter = (isset($options[self::OPTION_RESIZE_FILTER]))
-            ? (int)$options[self::OPTION_RESIZE_FILTER]
-            : Imagick::FILTER_LANCZOS;
-
-        $this->blur = (isset($options[self::OPTION_RESIZE_BLUR]))
-            ? (float)$options[self::OPTION_RESIZE_BLUR]
-            : 1.0;
+        $this->setColorMappingOptions($options);
+        $this->setColorReductionOptions($options);
+        $this->setImageLoadingOptions($options);
     }
 }
 

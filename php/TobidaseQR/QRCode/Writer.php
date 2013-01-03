@@ -3,7 +3,7 @@
  * PHP version 5.4
  *
  * とびだせ どうぶつの森™ マイデザインQRコードジェネレータ
- * デザインエンティティクラス
+ * QRコード書き込みクラス
  *
  * 「とびだせ どうぶつの森」は任天堂株式会社の登録商標です
  *
@@ -33,57 +33,33 @@
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  */
 
-namespace TobidaseQR\Entity;
+namespace TobidaseQR\QRCode;
 
-use TobidaseQR\Common\JSONSerializable;
-use TobidaseQR\Common\JSONSerialization;
+use TobidaseQR\Entity\MyDesign;
 
 /**
- * デザインエンティティクラス
+ * QRコード書き込みクラス
  */
-class Design implements JSONSerializable
+class Writer
 {
-    use JSONSerialization;
-
     /**
-     * デザインタイプ定数
-     */
-    // ワンピース（長袖、半袖、ノースリーブ）
-    const TYPE_DRESS_LONG_SLEEEVED  = 0;
-    const TYPE_DRESS_SHORT_SLEEEVED = 1;
-    const TYPE_DRESS_NO_SLEEEVE     = 2;
-    // Tシャツ（長袖、半袖、ノースリーブ）
-    const TYPE_SHIRT_LONG_SLEEEVED  = 3;
-    const TYPE_SHIRT_SHORT_SLEEEVED = 4;
-    const TYPE_SHIRT_NO_SLEEEVE     = 5;
-    // 帽子（ニット帽、つの帽子）
-    const TYPE_HAT_KNIT   = 6;
-    const TYPE_HAT_HORNED = 7;
-    // 不明
-    const TYPE_UNKNOWN = 8;
-    // 一般
-    const TYPE_GENERIC = 9;
-
-    /**
-     * デザインタイプ
+     * QRコードエンコーダ
      *
-     * @var int
+     * @var TobidaseQR\QRCode\Encoder
      */
-    public $type;
+    private $encoder;
 
     /**
-     * カラーパレット
+     * コンストラクタ
      *
-     * @var int[]
-     */
-    public $palette;
-
-    /**
-     * ビットマップデータ
+     * @param array $options QRコード作成オプション
      *
-     * @var int[][]
+     * @see TobidaseQR\QRCode\Encoder::__construct()
      */
-    public $bitmap;
+    public function __construct(array $options = [])
+    {
+        $this->encoder = new Encoder($options);
+    }
 }
 
 /*

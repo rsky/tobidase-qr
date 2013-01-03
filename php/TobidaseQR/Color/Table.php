@@ -250,17 +250,10 @@ class Table
      *
      * @throws InvalidArgumentException, OutOfBoundsException
      */
-    private function checkColorCode($code)
+    public function checkColorCode($code)
     {
         if (!is_integer($code) && !preg_match('/^[1-9][0-9]*$', strval($code))) {
             throw new InvalidArgumentException('Color code must be an integer');
-        }
-
-        if ($code < self::COLORCODE_MIN || self::COLORCODE_MAX < $code) {
-            throw new OutOfBoundsException(sprintf(
-                'The given color code (%d) is out of bounds [%d..%d]',
-                $code, self::COLORCODE_MIN, self::COLORCODE_MAX
-            ));
         }
 
         if (!isset($this->rgbColorTable[$code])) {
@@ -441,11 +434,11 @@ class Table
      * Imagickオブジェクトから近似色のヒストグラムを作成する
      *
      * @param Imagick $image 色空間は COLORSPACE_RGB or COLORSPACE_SRGB
-     * @param TobidaseQR\Color\Mapper $mapper
+     * @param TobidaseQR\Color\MapperInterface $mapper
      *
      * @return array
      */
-    public function createHistgram(Imagick $image, Mapper $mapper)
+    public function createHistgram(Imagick $image, MapperInterface $mapper)
     {
         $colorNum = self::COLORCODE_MAX - self::COLORCODE_MIN + 1;
         $histgram = array_fill(self::COLORCODE_MIN, $colorNum, 0);

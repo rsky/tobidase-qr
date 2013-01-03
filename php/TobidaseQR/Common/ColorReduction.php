@@ -3,7 +3,7 @@
  * PHP version 5.4
  *
  * とびだせ どうぶつの森™ マイデザインQRコードジェネレータ
- * デザインエンティティクラス
+ * 減色機能を持つトレイト
  *
  * 「とびだせ どうぶつの森」は任天堂株式会社の登録商標です
  *
@@ -33,57 +33,73 @@
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  */
 
-namespace TobidaseQR\Entity;
+namespace TobidaseQR\Common;
 
-use TobidaseQR\Common\JSONSerializable;
-use TobidaseQR\Common\JSONSerialization;
+use TobidaseQR\Color\Reducer;
 
 /**
- * デザインエンティティクラス
+ * 減色機能を持つトレイト
  */
-class Design implements JSONSerializable
+trait ColorReduction
 {
-    use JSONSerialization;
-
     /**
-     * デザインタイプ定数
-     */
-    // ワンピース（長袖、半袖、ノースリーブ）
-    const TYPE_DRESS_LONG_SLEEEVED  = 0;
-    const TYPE_DRESS_SHORT_SLEEEVED = 1;
-    const TYPE_DRESS_NO_SLEEEVE     = 2;
-    // Tシャツ（長袖、半袖、ノースリーブ）
-    const TYPE_SHIRT_LONG_SLEEEVED  = 3;
-    const TYPE_SHIRT_SHORT_SLEEEVED = 4;
-    const TYPE_SHIRT_NO_SLEEEVE     = 5;
-    // 帽子（ニット帽、つの帽子）
-    const TYPE_HAT_KNIT   = 6;
-    const TYPE_HAT_HORNED = 7;
-    // 不明
-    const TYPE_UNKNOWN = 8;
-    // 一般
-    const TYPE_GENERIC = 9;
-
-    /**
-     * デザインタイプ
+     * 減色処理オブジェクト
      *
-     * @var int
+     * @var TobidaseQR\Color\Reducer
      */
-    public $type;
+    protected $reducer;
 
     /**
-     * カラーパレット
+     * 連想配列のオプションからオブジェクトをセットする
      *
-     * @var int[]
+     * @param array $options
+     *
+     * @return void
      */
-    public $palette;
+    public function setColorReductionOptions(array $options = [])
+    {
+        if (isset($options[OptionKey::COLOR_REDUCER])) {
+            $this->setColorReducer($options[OptionKey::COLOR_REDUCER]);
+        } else {
+            $this->setStandardColorReducer();
+        }
+    }
 
     /**
-     * ビットマップデータ
+     * 減色処理オブジェクトを返す
      *
-     * @var int[][]
+     * @param void
+     *
+     * @return TobidaseQR\Color\Reducer $reduer
      */
-    public $bitmap;
+    public function getColorReducer()
+    {
+        return $this->reduer;
+    }
+
+    /**
+     * 減色処理オブジェクトをセットする
+     *
+     * @param TobidaseQR\Color\Reducer $reduer
+     *
+     * @return void
+     */
+    public function setColorReducer(Reducer $reduer)
+    {
+        $this->reduer = $reduer;
+    }
+
+    /**
+     * 標準の減色処理オブジェクトをセットする
+     *
+     * @param void
+     *
+     * @return void
+     */
+    public function setStandardColorReducer()
+    {
+        $this->reduer = new Reducer;
+    }
 }
 
 /*

@@ -36,6 +36,7 @@
 namespace TobidaseQR\Color;
 
 use InvalidArgumentException;
+use OverflowException;
 
 /**
  * 減色処理クラス
@@ -61,11 +62,11 @@ class Reducer
     private $paletteCount;
 
     /**
-     * 必ずパレットに含める色番号
+     * 必ずパレットに含める色番号のリスト
      *
-     * @var int
+     * @var int[]
      */
-    private $keyColor;
+    private $keyColors;
 
     /**
      * カラーテーブル
@@ -84,17 +85,12 @@ class Reducer
     /**
      * コンストラクタ
      *
-     * @param array $rgbTable
+     * @param TobidaseQR\Color\Table $Table
      * @param array $options
      */
-    public function __construct(array $rgbTable = null, array $options = [])
+    public function __construct(Table $table = null, array $options = [])
     {
-        if ($rgbTable) {
-            $this->table = $rgbTable;
-        } else {
-            $this->table = (new Table)->getRgbColorTable();
-        }
-
+        $this->table = $table ?: new Table;
         $this->parseOptions($options);
     }
 
@@ -105,7 +101,7 @@ class Reducer
      *
      * @return void
      *
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException, OverflowException
      */
     protected function parseOptions(array $options)
     {
@@ -120,16 +116,28 @@ class Reducer
         }
         $this->paletteCount = $paletteCount;
 
-        $keyColor = -1;
+        $this->keyColors = [];
         if (array_key_exists(self::OPTION_KEY_COLOR, $options)) {
-            $keyColor = (int)$options[self::OPTION_KEY_COLOR];
-            if (!array_key_exists($keyColor, $this->table)) {
+            $keyColors = (array)$options[self::OPTION_KEY_COLOR];
+            if (count($keyColors) > $this->paletteCount) {
+                throw new OverflowException(
+                    'Too many key colors was given',
+                    $e->getCode(), $e
+                );
+            }
+
+            try {
+                foreach ($keyColors as $keyColor) {
+                    $this->table->checkColorCode($keyColor);
+                    $this->keyColors[] = (int)$keyColor;
+                }
+            } catch (\Exception $e) {
                 throw new InvalidArgumentException(
-                    'specified keyColor is not available'
+                    'specified keyColor is not available',
+                    $e->getCode(), $e
                 );
             }
         }
-        $this->keyColor = $keyColor;
     }
 
     /**
@@ -142,17 +150,17 @@ class Reducer
     public function reduceColor(array $histgram)
     {
         $paletteCount = $this->paletteCount;
-        $keyColor = $this->keyColor;
+        $keyColors = array_reverse(array_unique($this->keyColors));
         $histgram = array_filter($histgram);
         arsort($histgram, SORT_NUMERIC);
 
         // STAGE 0: 減色の必要がなければそのまま存在する色だけを使う
-        if ($keyColor !== -1) {
+        foreach ($keyColors as $keyColor) {
             unset($histgram[$keyColor]);
-            $palette = array_keys($histgram);
+        }
+        $palette = array_keys($histgram);
+        foreach ($keyColors as $keyColor) {
             array_unshift($palette, $keyColor);
-        } else {
-            $palette = array_keys($histgram);
         }
         if (count($palette) <= $paletteCount) {
             return $this->createReducedColorTable($palette);
@@ -161,18 +169,23 @@ class Reducer
         // STAGE 1: 最もよく使われる色を抽出する
         $palette = $this->filterTopColors($histgram);
         $remains = array_slice(array_keys($histgram), count($palette));
-        if ($keyColor !== -1) {
+        foreach ($keyColors as $keyColor) {
             array_unshift($palette, $keyColor);
         }
         $splitLimit = $paletteCount - count($palette);
+        if ($splitLimit <= 0) {
+            $palette = array_slice($palette, 0, $paletteCount);
+
+            return $this->createReducedColorTable($palette);
+        }
 
         // STAGE 2: 残りの色から作成した範囲オブジェクトのリストを
         // メディアンカット法で必要な数まで分割する
         $colors = [];
         foreach ($remains as $code) {
-            $colors[$code] = new RGBColor(
-                $code, $this->table[$code], $histgram[$code]
-            );
+            $color = $this->table->getRgbColor($code);
+            $color->frequency = $histgram[$code];
+            $colors[$code] = $color;
         }
 
         $this->ranges = [new Range($colors)];
@@ -291,7 +304,7 @@ class Reducer
         $reducedTable = [];
 
         foreach ($palette as $code) {
-            $reducedTable[$code] = $this->table[$code];
+            $reducedTable[$code] = $this->table->getRgbComponents($code);
         }
 
         return new Table($reducedTable);

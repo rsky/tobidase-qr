@@ -43,6 +43,13 @@ abstract class CombinedBuilder extends AbstractBuilder
      */
     protected $segment4;
 
+    /**
+     * 変更を検出するための値
+     *
+     * @var string
+     */
+    protected $checksum;
+
     public function __construct(Loader $loader, array $options = [])
     {
         parent::__construct($loader, $options);
@@ -53,16 +60,11 @@ abstract class CombinedBuilder extends AbstractBuilder
         $this->segment4 = array_fill(0, 32, array_fill(0, 32, 0));
     }
 
-    public function getHistgram()
+    public function getBitmap()
     {
-    }
-
-    public function getPalette()
-    {
-    }
-
-    public function getEncodedData()
-    {
+        return array_merge(
+            $this->segment1, $this->segment2, $this->segment3, $this->segment4
+        );
     }
 
     public function setImage($image)

@@ -3,7 +3,7 @@
  * PHP version 5.4
  *
  * とびだせ どうぶつの森™ マイデザインQRコードジェネレータ
- * JSON形式にシリアライズ可能な機能を持つインターフェイス
+ * オプションキークラス
  *
  * 「とびだせ どうぶつの森」は任天堂株式会社の登録商標です
  *
@@ -33,30 +33,17 @@
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  */
 
-namespace TobidaseQR;
+namespace TobidaseQR\Common;
 
 /**
- * JSON形式にシリアライズ可能な機能を持つインターフェイス
+ * オプションキークラス
  */
-interface JSONSerializable extends \Serializable
+class OptionKey
 {
-    /**
-     * JSON表現を返す
-     *
-     * @param int $options
-     *
-     * @return string
-     */
-    public function exportJson($options = 0);
-
-    /**
-     * JSONから値を復元する
-     *
-     * @param string $json
-     *
-     * @return void
-     */
-    public function importJson($json);
+    const OPTION_IMAGE_LOADER   = 'imageLoader';
+    const OPTION_COLOR_MAPPER   = 'colorMapper';
+    const OPTION_COLOR_REDUCER  = 'colorReducer';
+    const OPTION_COLOR_TABLE    = 'colorTable';
 }
 
 /*
