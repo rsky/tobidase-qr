@@ -58,8 +58,8 @@ trait ImageLoading
      */
     public function setImageLoadingOptions(array $options = [])
     {
-        if (isset($options[OptionKey::IMAGE_LOADER])) {
-            $this->setImageLoader($options[OptionKey::IMAGE_LOADER]);
+        if (isset($options[Option::IMAGE_LOADER])) {
+            $this->setImageLoader($options[Option::IMAGE_LOADER]);
         } else {
             $this->setStandardImageLoader();
         }

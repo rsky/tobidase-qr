@@ -3,7 +3,7 @@
  * PHP version 5.4
  *
  * とびだせ どうぶつの森™ マイデザインQRコードジェネレータ
- * オプションキークラス
+ * オプションキー定数クラス
  *
  * 「とびだせ どうぶつの森」は任天堂株式会社の登録商標です
  *
@@ -36,14 +36,23 @@
 namespace TobidaseQR\Common;
 
 /**
- * オプションキークラス
+ * オプションキー定数クラス
  */
-class OptionKey
+class Option
 {
-    const OPTION_IMAGE_LOADER   = 'imageLoader';
-    const OPTION_COLOR_MAPPER   = 'colorMapper';
-    const OPTION_COLOR_REDUCER  = 'colorReducer';
-    const OPTION_COLOR_TABLE    = 'colorTable';
+    const IMAGE_LOADER  = 'imageLoader';
+    const COLOR_MAPPER  = 'colorMapper';
+    const COLOR_REDUCER = 'colorReducer';
+    const COLOR_TABLE   = 'colorTable';
+    const PALETTE_COUNT = 'paletteCount';
+    const KEY_COLOR     = 'keyColor';
+    const DITHERING     = 'dithering';
+    const DITHERING_ALGORITHM   = 'ditheringAlgorithm';
+    const RESIZE_FILTER = 'resizeFilter';
+    const RESIZE_BLUR   = 'resizeBlur';
+    const MY_DESIGN_TYPE    = 'myDesignType';
+    const DIFFUSION_WEIGHT  = 'diffusionWeight';
+    const WEAVING_SCAN      = 'weavingScan';
 }
 
 /*

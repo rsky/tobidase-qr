@@ -44,6 +44,25 @@ use Imagick;
 interface DitheringAlgorithm
 {
     /**
+     * ディザリングアルゴリズム名
+     */
+    const FLOYD_STEINBERG       = 'FloydSteinberg';
+    const FALSE_FLOYD_STEINBERG = 'FalseFloydSteinberg';
+    const JARVIS_JUDICE_NINKE   = 'JarvisJudiceNinke';
+    const STUCKI      = 'Stucki';
+    const BURKES      = 'Burkes';
+    const SIERRA3     = 'Sierra3';
+    const SIERRA2     = 'Sierra2';
+    const SIERRA_2_4A = 'Sierra24A';
+
+    /**
+     * ディザリングアルゴリズムの別名
+     */
+    const JAJUNI      = self::JARVIS_JUDICE_NINKE;
+    const SIERRA      = self::SIERRA3;
+    const SIERRA_LITE = self::SIERRA_2_4A;
+
+    /**
      * コンストラクタ
      *
      * @param array $options

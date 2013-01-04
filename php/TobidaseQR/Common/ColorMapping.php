@@ -67,14 +67,14 @@ trait ColorMapping
      */
     public function setColorMappingOptions(array $options = [])
     {
-        if (isset($options[OptionKey::COLOR_MAPPER])) {
-            $this->setColorMapper($options[OptionKey::COLOR_MAPPER]);
+        if (isset($options[Option::COLOR_MAPPER])) {
+            $this->setColorMapper($options[Option::COLOR_MAPPER]);
         } else {
             $this->setStandardColorMapper();
         }
 
-        if (isset($options[OptionKey::COLOR_TABLE])) {
-            $this->setColorTable($options[OptionKey::COLOR_TABLE]);
+        if (isset($options[Option::COLOR_TABLE])) {
+            $this->setColorTable($options[Option::COLOR_TABLE]);
         } else {
             $this->setStandardColorReducer();
         }

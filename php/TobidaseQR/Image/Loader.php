@@ -36,6 +36,7 @@
 namespace TobidaseQR\Image;
 
 use TobidaseQR\Common\ColorMapping;
+use TobidaseQR\Common\Option;
 use Imagick;
 
 /**
@@ -44,14 +45,6 @@ use Imagick;
 class Loader
 {
     use ColorMapping;
-
-    /**
-     * オプションキー
-     */
-    const OPTION_RESIZE_FILTER = 'resizeFilter';
-    const OPTION_RESIZE_BLUR   = 'resizeBlur';
-    const OPTION_COLOR_MAPPER  = 'colorMapper';
-    const OPTION_COLOR_TABLE   = 'colorTable';
 
     /**
      * リサイズで使う窓関数の既定値
@@ -84,22 +77,22 @@ class Loader
      */
     public function __construct(array $options = [])
     {
-        $this->filter = (isset($options[self::OPTION_RESIZE_FILTER]))
-            ? (int)$options[self::OPTION_RESIZE_FILTER]
+        $this->filter = (isset($options[Option::RESIZE_FILTER]))
+            ? (int)$options[Option::RESIZE_FILTER]
             : self::DEFAULT_RESIZE_FILTER;
 
-        $this->blur = (isset($options[self::OPTION_RESIZE_BLUR]))
-            ? (float)$options[self::OPTION_RESIZE_BLUR]
+        $this->blur = (isset($options[Option::RESIZE_BLUR]))
+            ? (float)$options[Option::RESIZE_BLUR]
             : self::DEFAULT_RESIZE_BLUR;
 
-        if (isset($options[self::OPTION_COLOR_MAPPER])) {
-            $this->setColorMapper($options[self::OPTION_COLOR_MAPPER]);
+        if (isset($options[Option::COLOR_MAPPER])) {
+            $this->setColorMapper($options[Option::COLOR_MAPPER]);
         } else {
             $this->setStandardColorMapper();
         }
 
-        if (isset($options[self::OPTION_COLOR_TABLE])) {
-            $this->setColorTable($options[self::OPTION_COLOR_TABLE]);
+        if (isset($options[Option::COLOR_TABLE])) {
+            $this->setColorTable($options[Option::COLOR_TABLE]);
         } else {
             $this->setStandardColorTable();
         }

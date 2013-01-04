@@ -36,6 +36,8 @@
 namespace TobidaseQR\Color\Mapper;
 
 use TobidaseQR\Color\Table;
+use TobidaseQR\Common\Option;
+use TobidaseQR\Image\DitheringAlgorithm;
 use Imagick;
 use InvalidArgumentException;
 
@@ -47,29 +49,9 @@ use InvalidArgumentException;
 class DitheringMapper extends AbstractMapper
 {
     /**
-     * オプションキー
+     * 既定のアルゴリズム
      */
-    const OPTION_ALGORITHM = 'ditheringAlgorithm';
-
-    /**
-     * ディザリングアルゴリズム
-     */
-    const ALGO_FLOYD_STEINBERG       = 'FloydSteinberg';
-    const ALGO_FALSE_FLOYD_STEINBERG = 'FalseFloydSteinberg';
-    const ALGO_JARVIS_JUDICE_NINKE   = 'JarvisJudiceNinke';
-    const ALGO_STUCKI      = 'Stucki';
-    const ALGO_BURKES      = 'Burkes';
-    const ALGO_SIERRA3     = 'Sierra3';
-    const ALGO_SIERRA2     = 'Sierra2';
-    const ALGO_SIERRA_2_4A = 'Sierra24A';
-
-    /**
-     * ディザリングアルゴリズムの別名
-     */
-    const ALGO_JAJUNI      = self::ALGO_JARVIS_JUDICE_NINKE;
-    const ALGO_SIERRA      = self::ALGO_SIERRA3;
-    const ALGO_SIERRA_LITE = self::ALGO_SIERRA_2_4A;
-    const ALGO_DEFAULT     = self::ALGO_SIERRA3;
+    const DEFAULT_ALGORITHM = DitheringAlgorithm::SIERRA3;
 
     /**
      * ディザリングアルゴリズムを実装したオブジェクト
@@ -87,13 +69,16 @@ class DitheringMapper extends AbstractMapper
     {
         parent::__construct($options);
 
-        $algorithm = (isset($options[self::OPTION_ALGORITHM]))
-            ? $options[self::OPTION_ALGORITHM]
-            : self::ALGO_DEFAULT;
+        $algorithm = (isset($options[Option::DITHERING_ALGORITHM]))
+            ? $options[Option::DITHERING_ALGORITHM]
+            : self::DEFAULT_ALGORITHM;
 
-        $ditheringClass = 'TobidaseQR\\Image\\Dithering\\' . $algorithm;
-
-        $this->dithering = new $ditheringClass($options);
+        if (is_object($algorithm) && $algorithm instanceof DitheringAlgorithm) {
+            $this->dithering = $algorithm;
+        } else {
+            $ditheringClass = 'TobidaseQR\\Image\\Dithering\\' . $algorithm;
+            $this->dithering = new $ditheringClass($options);
+        }
     }
 
     /**

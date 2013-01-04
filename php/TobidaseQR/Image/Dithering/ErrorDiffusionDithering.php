@@ -37,6 +37,7 @@ namespace TobidaseQR\Image\Dithering;
 
 use TobidaseQR\Image\DitheringAlgorithm;
 use TobidaseQR\Color\Table;
+use TobidaseQR\Common\Option;
 use Imagick;
 
 /**
@@ -44,12 +45,6 @@ use Imagick;
  */
 abstract class ErrorDiffusionDithering implements DitheringAlgorithm
 {
-    /**
-     * オプションキー
-     */
-    const OPTION_DIFFUSION_WEIGHT = 'diffusionWeight';
-    const OPTION_WEAVING_SCAN = 'weavingScan';
-
     /**
      * 誤差拡散係数に掛ける重みのデフォルト値
      *
@@ -107,12 +102,12 @@ abstract class ErrorDiffusionDithering implements DitheringAlgorithm
      */
     public function __construct(array $options = [])
     {
-        $this->weaving = (isset($options[self::OPTION_WEAVING_SCAN]))
-            ? (bool)$options[self::OPTION_WEAVING_SCAN]
+        $this->weaving = (isset($options[Option::WEAVING_SCAN]))
+            ? (bool)$options[Option::WEAVING_SCAN]
             : true;
 
-        $this->weight = (isset($options[self::OPTION_DIFFUSION_WEIGHT]))
-            ? (float)$options[self::OPTION_DIFFUSION_WEIGHT]
+        $this->weight = (isset($options[Option::DIFFUSION_WEIGHT]))
+            ? (float)$options[Option::DIFFUSION_WEIGHT]
             : self::DEFAULT_DIFFUSION_WEIGHT;
     }
 

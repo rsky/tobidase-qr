@@ -35,6 +35,7 @@
 
 namespace TobidaseQR\Color;
 
+use TobidaseQR\Common\Option;
 use InvalidArgumentException;
 use OverflowException;
 
@@ -43,12 +44,6 @@ use OverflowException;
  */
 class Reducer
 {
-    /**
-     * オプションキー
-     */
-    const OPTION_PALETTE_COUNT = 'paletteCount';
-    const OPTION_KEY_COLOR     = 'keyColor';
-
     /**
      * パレット色数の既定値
      */
@@ -106,8 +101,8 @@ class Reducer
     protected function parseOptions(array $options)
     {
         $paletteCount = self::DEFAULT_PALETTE_COUNT;
-        if (array_key_exists(self::OPTION_PALETTE_COUNT, $options)) {
-            $paletteCount = (int)$options[self::OPTION_PALETTE_COUNT];
+        if (array_key_exists(Option::PALETTE_COUNT, $options)) {
+            $paletteCount = (int)$options[Option::PALETTE_COUNT];
             if ($paletteCount < 1) {
                 throw new InvalidArgumentException(
                     'paletteCount must be a positive integer'
@@ -117,8 +112,8 @@ class Reducer
         $this->paletteCount = $paletteCount;
 
         $this->keyColors = [];
-        if (array_key_exists(self::OPTION_KEY_COLOR, $options)) {
-            $keyColors = (array)$options[self::OPTION_KEY_COLOR];
+        if (array_key_exists(Option::KEY_COLOR, $options)) {
+            $keyColors = (array)$options[Option::KEY_COLOR];
             if (count($keyColors) > $this->paletteCount) {
                 throw new OverflowException(
                     'Too many key colors was given',

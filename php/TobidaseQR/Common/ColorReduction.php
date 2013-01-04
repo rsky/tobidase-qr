@@ -58,8 +58,8 @@ trait ColorReduction
      */
     public function setColorReductionOptions(array $options = [])
     {
-        if (isset($options[OptionKey::COLOR_REDUCER])) {
-            $this->setColorReducer($options[OptionKey::COLOR_REDUCER]);
+        if (isset($options[Option::COLOR_REDUCER])) {
+            $this->setColorReducer($options[Option::COLOR_REDUCER]);
         } else {
             $this->setStandardColorReducer();
         }

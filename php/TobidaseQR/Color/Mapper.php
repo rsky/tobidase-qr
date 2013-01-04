@@ -35,6 +35,7 @@
 
 namespace TobidaseQR\Color;
 
+use TobidaseQR\Common\Option;
 use Imagick;
 
 /**
@@ -42,11 +43,6 @@ use Imagick;
  */
 class Mapper implements MapperInterface
 {
-    /**
-     * オプションキー
-     */
-    const OPTION_DITHERING = 'dithering';
-
     /**
      * 実際に色の割当を行うクラス
      *
@@ -62,7 +58,7 @@ class Mapper implements MapperInterface
     public function __construct(array $options = [])
     {
         $mapperClass = 'TobidaseQR\\Color\\Mapper\\';
-        if (!empty($options[Mapper::OPTION_DITHERING])) {
+        if (!empty($options[Option::DITHERING])) {
             $mapperClass .= 'DitheringMapper';
         } else {
             $mapperClass .= 'SimpleMapper';
