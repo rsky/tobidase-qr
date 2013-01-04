@@ -41,7 +41,7 @@ use TobidaseQR\Entity\MyDesign;
 use TobidaseQR\Entity\Player;
 use TobidaseQR\Entity\Village;
 use TobidaseQR\Exception\DecoderException;
-use TobidaseQR\Validator;
+use TobidaseQR\Common\Validator;
 use Imagick;
 use UnexpectedValueException;
 
