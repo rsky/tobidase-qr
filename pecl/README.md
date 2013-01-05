@@ -56,13 +56,13 @@ To get the text data:
 
 	$text = zx_read_qrcode('qrocde.png');
 
-To get the binary (raw) data:
+To get the binary (raw) data, the symbol version and the error correction level as an associative array:
 
-	$text = zx_read_qrcode('qrocde.png', ZX_READ_RAW);
+	$info = zx_read_qrcode('qrocde.png', ZX_READ_RAW);
 
 To get the QR Code symbol (barcode matrix) data:
 
-	$text = zx_read_qrcode('qrocde.png', ZX_READ_MATRIX);
+	$symbol = zx_read_qrcode('qrocde.png', ZX_READ_MATRIX);
 
 
 LICENSE
