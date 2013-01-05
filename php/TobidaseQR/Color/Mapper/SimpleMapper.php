@@ -57,7 +57,6 @@ class SimpleMapper extends AbstractMapper
      */
     public function map(Imagick $image, Table $table)
     {
-        $palette = $table->getRgbColorTable();
         $width  = $image->getImageWidth();
         $height = $image->getImageHeight();
         $rows = [];

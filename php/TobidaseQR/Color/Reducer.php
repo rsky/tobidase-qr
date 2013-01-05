@@ -141,7 +141,7 @@ class Reducer
      *
      * @param array $histgram
      *
-     * @return array
+     * @return TobidaseQR\Color\Table
      */
     public function reduceColor(array $histgram)
     {

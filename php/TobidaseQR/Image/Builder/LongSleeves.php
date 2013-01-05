@@ -3,14 +3,42 @@ namespace TobidaseQR\Image\Builder;
 
 trait LongSleeves
 {
-    public function setLeftImage($image)
+    protected function loadLeftImage($image)
     {
         $this->leftImage = $this->loader->load($image, 16, 32);
     }
 
-    public function setRightImage($image)
+    protected function loadRightImage($image)
     {
         $this->rightImage = $this->loader->load($image, 16, 32);
+    }
+
+    protected function locateLeftImage(Table $table)
+    {
+        if (!$this->leftImage) {
+            return;
+        }
+
+        $bitmap = $this->mapper->map($this->leftImage, $table);
+        for ($y = 0; $y < 32; $y++) {
+            for ($x = 0; $x < 16; $x++) {
+                $this->segment3[31 - $x][$y] = $bitmap[$y][$x];
+            }
+        }
+    }
+
+    protected function locateRightImage(Table $table)
+    {
+        if (!$this->rightImage) {
+            return;
+        }
+
+        $bitmap = $this->mapper->map($this->rightImage, $table);
+        for ($y = 0; $y < 32; $y++) {
+            for ($x = 0; $x < 16; $x++) {
+                $this->segment3[15 - $x][$y] = $bitmap[$y][$x];
+            }
+        }
     }
 }
 

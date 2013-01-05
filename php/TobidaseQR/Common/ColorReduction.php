@@ -51,6 +51,21 @@ trait ColorReduction
     protected $reducer;
 
     /**
+     * 減色済カラーテーブル
+     *
+     * @var TobidaseQR\Color\Table
+     */
+    protected $reducedTable;
+
+    /**
+     * 最後に与えられたヒストグラムを正規化したもののJSON値
+     * 減色済カラーテーブルを再利用する判定に使う
+     *
+     * @var string
+     */
+    private $histgramJson;
+
+    /**
      * 連想配列のオプションからオブジェクトをセットする
      *
      * @param array $options
@@ -71,23 +86,23 @@ trait ColorReduction
      *
      * @param void
      *
-     * @return TobidaseQR\Color\Reducer $reduer
+     * @return TobidaseQR\Color\Reducer $reducer
      */
     public function getColorReducer()
     {
-        return $this->reduer;
+        return $this->reducer;
     }
 
     /**
      * 減色処理オブジェクトをセットする
      *
-     * @param TobidaseQR\Color\Reducer $reduer
+     * @param TobidaseQR\Color\Reducer $reducer
      *
      * @return void
      */
-    public function setColorReducer(Reducer $reduer)
+    public function setColorReducer(Reducer $reducer)
     {
-        $this->reduer = $reduer;
+        $this->reducer = $reducer;
     }
 
     /**
@@ -99,7 +114,29 @@ trait ColorReduction
      */
     public function setStandardColorReducer()
     {
-        $this->reduer = new Reducer;
+        $this->reducer = new Reducer;
+    }
+
+    /**
+     * 減色済テーブルを得る
+     *
+     * @param array $histgram
+     *
+     * @return TobidaseQR\Color\Table
+     */
+    protected function reduceColor(array $histgram)
+    {
+        $histgram = array_filter($histgram);
+        ksort($histgram, SORT_NUMERIC);
+        $json = json_encode($histgram, JSON_FORCE_OBJECT);
+        if ($this->reducedTable && $json === $this->histgramJson) {
+            return $this->reducedTable;
+        }
+
+        $this->reducedTable = $this->reducer->reduceColor($histgram);
+        $this->histgramJson = $json;
+
+        return $this->reducedTable;
     }
 }
 

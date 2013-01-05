@@ -5,14 +5,24 @@ use DomainException;
 
 trait NoSleeve
 {
-    public function setLeftImage($image)
+    protected function loadLeftImage($image)
     {
         throw new DomainException('There is no sleeve');
     }
 
-    public function setRightImage($image)
+    protected function loadRightImage($image)
     {
         throw new DomainException('There is no sleeve');
+    }
+
+    protected function locateRightImage(Table $table)
+    {
+        // pass
+    }
+
+    protected function locateLeftImage(Table $table)
+    {
+        // pass
     }
 }
 

@@ -1,16 +1,56 @@
 <?php
 namespace TobidaseQR\Image\Builder;
 
+use TobidaseQR\Color\Table;
+
 trait Dress
 {
-    public function setFrontImage($image)
+    protected function loadFrontImage($image)
     {
         $this->frontImage = $this->loader->load($image, 32, 48);
     }
 
-    public function setBackImage($image)
+    protected function loadBackImage($image)
     {
         $this->backImage = $this->loader->load($image, 32, 48);
+    }
+
+    protected function locateFrontImage(Table $table)
+    {
+        if (!$this->frontImage) {
+            return;
+        }
+
+        $bitmap = $this->mapper->map($this->frontImage, $table);
+        for ($y = 0; $y < 32; $y++) {
+            for ($x = 0; $x < 32; $x++) {
+                $this->segment1[$y][$x] = $bitmap[$y][$x];
+            }
+        }
+        for ($y = 32; $y < 48; $y++) {
+            for ($x = 0; $x < 32; $x++) {
+                $this->segment4[$y - 32][$x] = $bitmap[$y][$x];
+            }
+        }
+    }
+
+    protected function locateBackImage(Table $table)
+    {
+        if (!$this->backImage) {
+            return;
+        }
+
+        $bitmap = $this->mapper->map($this->backImage, $table);
+        for ($y = 0; $y < 32; $y++) {
+            for ($x = 0; $x < 32; $x++) {
+                $this->segment2[$y][$x] = $bitmap[$y][$x];
+            }
+        }
+        for ($y = 32; $y < 48; $y++) {
+            for ($x = 0; $x < 32; $x++) {
+                $this->segment4[$y - 16][$x] = $bitmap[$y][$x];
+            }
+        }
     }
 }
 

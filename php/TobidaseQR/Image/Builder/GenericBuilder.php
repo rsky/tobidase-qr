@@ -8,16 +8,64 @@ class GenericBuilder extends AbstractBuilder
      */
     protected $image;
 
+    /**
+     * @var array
+     */
+    protected $histgram;
+
+    /**
+     * @var int[]
+     */
+    protected $palette;
+
+    /**
+     * @var int[][]
+     */
+    protected $bitmap;
+
     public function getHistgram()
     {
+        if ($this->histgram) {
+            return $this->histgram;
+        } elseif (!$this->image) {
+            return null;
+        }
+
+        $this->histgram = $this->table->createHistgram(
+            $this->image, $this->mapper
+        );
+
+        return $this->histgram;
     }
 
     public function getPalette()
     {
+        if ($this->palette) {
+            return $this->palette;
+        } elseif (!$this->image) {
+            return null;
+        }
+
+        $this->palette = array_keys(
+            $this->reduceColor($this->getHistgram())->getRgbColorTable()
+        );
+
+        return $this->palette;
     }
 
     public function getBitmap()
     {
+        if ($this->bitmap) {
+            return $this->bitmap;
+        } elseif (!$this->image) {
+            return null;
+        }
+
+        $this->bitmap = $this->mapper->map(
+            $this->image, $this->reduceColor($this->getHistgram())
+        );
+
+        return $this->bitmap;
     }
 
     public function getImage()
@@ -28,6 +76,9 @@ class GenericBuilder extends AbstractBuilder
     public function setImage($image)
     {
         $this->image = $this->loader->load($image, 32, 32);
+        $this->histgram = null;
+        $this->palette = null;
+        $this->bitmap = null;
     }
 }
 
