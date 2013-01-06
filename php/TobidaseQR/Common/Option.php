@@ -41,18 +41,19 @@ namespace TobidaseQR\Common;
  */
 class Option
 {
-    const IMAGE_LOADER  = 'imageLoader';
-    const COLOR_MAPPER  = 'colorMapper';
-    const COLOR_REDUCER = 'colorReducer';
-    const COLOR_TABLE   = 'colorTable';
-    const PALETTE_COUNT = 'paletteCount';
-    const KEY_COLOR     = 'keyColor';
-    const DITHERING     = 'dithering';
-    const RESIZE_FILTER = 'resizeFilter';
-    const RESIZE_BLUR   = 'resizeBlur';
-    const DESIGN_TYPE   = 'designType';
-    const WEAVING_SCAN  = 'weavingScan';
-    const DIFFUSION_WEIGHT = 'diffusionWeight';
+    const IMAGE_LOADER      = 'imageLoader';
+    const COLOR_MAPPER      = 'colorMapper';
+    const COLOR_REDUCER     = 'colorReducer';
+    const COLOR_TABLE       = 'colorTable';
+    const HISTGRAM_MAPPER   = 'histgramMapper';
+    const PALETTE_COUNT     = 'paletteCount';
+    const KEY_COLOR         = 'keyColor';
+    const DITHERING         = 'dithering';
+    const RESIZE_FILTER     = 'resizeFilter';
+    const RESIZE_BLUR       = 'resizeBlur';
+    const DESIGN_TYPE       = 'designType';
+    const WEAVING_SCAN      = 'weavingScan';
+    const DIFFUSION_WEIGHT  = 'diffusionWeight';
 }
 
 /*

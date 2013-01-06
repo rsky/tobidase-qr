@@ -77,7 +77,7 @@ trait ColorReduction
         if (isset($options[Option::COLOR_REDUCER])) {
             $this->setColorReducer($options[Option::COLOR_REDUCER]);
         } else {
-            $this->setStandardColorReducer();
+            $this->setColorReducer(new Reducer);
         }
     }
 
@@ -103,18 +103,6 @@ trait ColorReduction
     public function setColorReducer(Reducer $reducer)
     {
         $this->reducer = $reducer;
-    }
-
-    /**
-     * 標準の減色処理オブジェクトをセットする
-     *
-     * @param void
-     *
-     * @return void
-     */
-    public function setStandardColorReducer()
-    {
-        $this->reducer = new Reducer;
     }
 
     /**

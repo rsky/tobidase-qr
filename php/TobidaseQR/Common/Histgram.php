@@ -3,7 +3,7 @@
  * PHP version 5.4
  *
  * とびだせ どうぶつの森™ マイデザインQRコードジェネレータ
- * 色の割り当て機能を持つトレイト
+ * ヒストグラム作成機能を持つトレイト
  *
  * とびだせ どうぶつの森は任天堂(株)の登録商標です
  * QRコードは(株)デンソーウェーブの登録商標です
@@ -42,17 +42,10 @@ use TobidaseQR\Color\Table;
 use Imagick;
 
 /**
- * 色の割り当て機能を持つトレイト
+ * ヒストグラム作成機能を持つトレイト
  */
-trait ColorMapping
+trait Histgram
 {
-    /**
-     * カラーマッパーオブジェクト
-     *
-     * @var TobidaseQR\Color\MapperInterface
-     */
-    private $mapper;
-
     /**
      * カラーテーブルオブジェクト
      *
@@ -61,58 +54,106 @@ trait ColorMapping
     private $table;
 
     /**
+     * カラーマッパーオブジェクト
+     *
+     * @var TobidaseQR\Color\MapperInterface
+     */
+    private $histgramMapper;
+
+    /**
      * 連想配列のオプションからオブジェクトをセットする
      *
      * @param array $options
      *
      * @return void
      */
-    public function setColorMappingOptions(array $options = [])
+    public function setHistgramOptions(array $options = [])
     {
-        if (isset($options[Option::COLOR_MAPPER])) {
-            $this->setColorMapper($options[Option::COLOR_MAPPER]);
+        if (isset($options[Option::COLOR_TABLE])) {
+            $this->setColorTable($options[Option::COLOR_TABLE]);
         } else {
-            $this->setColorMapper(new SimpleMapper);
+            $this->setColorTable(new Table);
+        }
+
+        if (isset($options[Option::HISTGRAM_MAPPER])) {
+            $this->setHistgramMapper($options[Option::HISTGRAM_MAPPER]);
+        } else {
+            $this->setHistgramMapper(new SimpleMapper);
         }
     }
 
     /**
-     * カラーマッパーを返す
+     * ヒストグラム作成用のカラーマッパーを返す
      *
      * @param void
      *
-     * @return TobidaseQR\Color\MapperInterface $mapper
+     * @return TobidaseQR\Color\MapperInterface $histgramMapper
      */
-    public function getColorMapper()
+    public function getHistgramMapper()
     {
-        return $this->mapper;
+        return $this->histgramMapper;
     }
 
     /**
-     * カラーマッパーをセットする
+     * カラーテーブルを返す
      *
-     * @param TobidaseQR\Color\MapperInterface $mapper
+     * @param void
+     *
+     * @return TobidaseQR\Color\Table $table
+     */
+    public function getColorTable()
+    {
+        return $this->table;
+    }
+
+    /**
+     * ヒストグラム作成用のカラーマッパーをセットする
+     *
+     * @param TobidaseQR\Color\MapperInterface $histgramMapper
      *
      * @return void
      */
-    public function setColorMapper(MapperInterface $mapper)
+    public function setHistgramMapper(MapperInterface $histgramMapper)
     {
-        $this->mapper = $mapper;
+        $this->histgramMapper = $histgramMapper;
     }
 
     /**
-     * 画像の各ピクセルにカラーコードを割り当てる
+     * カラーテーブルをセットする
      *
-     * @param Imagick $image
      * @param TobidaseQR\Color\Table $table
      *
-     * @return int[][] カラーコードの2次元配列
-     *
-     * @see TobidaseQR\Color\MapperInterface::map()
+     * @return void
      */
-    protected function createBitmap(Imagick $image, Table $table)
+    public function setColorTable(Table $table)
     {
-        return $this->mapper->map($image, $table);
+        $this->table = $table;
+    }
+
+    /**
+     * 有効なカラーコードのリストを返す
+     *
+     * @param void
+     *
+     * @return int[]
+     */
+    protected function getAllColorCodes()
+    {
+        return array_keys($this->table->getRgbColorTable());
+    }
+
+    /**
+     * Imagickオブジェクトから近似色のヒストグラムを作成する
+     *
+     * @param Imagick $image 色空間は COLORSPACE_RGB or COLORSPACE_SRGB
+     *
+     * @return array
+     *
+     * @see TobidaseQR\Color\Table::createHistgram()
+     */
+    protected function createHistgram(Imagick $image)
+    {
+        return $this->table->createHistgram($image, $this->histgramMapper);
     }
 }
 

@@ -4,6 +4,7 @@ namespace TobidaseQR\Image\Builder;
 use TobidaseQR\Image\BuilderInterface;
 use TobidaseQR\Common\ColorMapping;
 use TobidaseQR\Common\ColorReduction;
+use TobidaseQR\Common\Histgram;
 use TobidaseQR\Common\ImageLoading;
 use TobidaseQR\Entity\Design;
 
@@ -11,6 +12,7 @@ abstract class AbstractBuilder implements BuilderInterface
 {
     use ColorMapping;
     use ColorReduction;
+    use Histgram;
     use ImageLoading;
 
     /**
@@ -22,6 +24,7 @@ abstract class AbstractBuilder implements BuilderInterface
     {
         $this->setColorMappingOptions($options);
         $this->setColorReductionOptions($options);
+        $this->setHistgramOptions($options);
         $this->setImageLoadingOptions($options);
     }
 

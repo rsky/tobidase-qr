@@ -65,8 +65,6 @@ class Table
     /**
      * マイデザインのカラーパレットとRGB値の対応表
      *
-     * この表の索引+1が実際のカラーコード
-     *
      * @var array
      */
     private $rgbColorTable = [

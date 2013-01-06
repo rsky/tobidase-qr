@@ -62,7 +62,7 @@ trait ImageLoading
         if (isset($options[Option::IMAGE_LOADER])) {
             $this->setImageLoader($options[Option::IMAGE_LOADER]);
         } else {
-            $this->setStandardImageLoader();
+            $this->setImageLoader(new Loader);
         }
     }
 
@@ -88,18 +88,6 @@ trait ImageLoading
     public function setImageLoader(Loader $loader)
     {
         $this->loader = $loader;
-    }
-
-    /**
-     * 標準の画像ローダーをセットする
-     *
-     * @param void
-     *
-     * @return void
-     */
-    public function setStandardImageLoader()
-    {
-        $this->loader = new Loader;
     }
 
     /**

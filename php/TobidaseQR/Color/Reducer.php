@@ -81,28 +81,27 @@ class Reducer
     /**
      * コンストラクタ
      *
-     * @param TobidaseQR\Color\Table $Table
      * @param array $options
-     */
-    public function __construct(Table $table = null, array $options = [])
-    {
-        $this->table = $table ?: new Table;
-        $this->parseOptions($options);
-    }
-
-    /**
-     * 減色オプションを解析する
-     *
-     * @param void
-     *
-     * @return void
      *
      * @throws InvalidArgumentException, OverflowException
      */
-    protected function parseOptions(array $options)
+    public function __construct(array $options = [])
     {
+        if (isset($options[Option::COLOR_TABLE])) {
+            $table = $options[Option::COLOR_TABLE];
+            if (!$table instanceof Table) {
+                throw new InvalidArgumentException(
+                    'colorTable must be an instance of'
+                    . ' TobidaseQR\\Color\\Table'
+                );
+            }
+        } else {
+            $table = new Table;
+        }
+        $this->table = $table;
+
         $paletteCount = self::DEFAULT_PALETTE_COUNT;
-        if (array_key_exists(Option::PALETTE_COUNT, $options)) {
+        if (isset($options[Option::PALETTE_COUNT])) {
             $paletteCount = (int)$options[Option::PALETTE_COUNT];
             if ($paletteCount < 1) {
                 throw new InvalidArgumentException(
@@ -112,10 +111,10 @@ class Reducer
         }
         $this->paletteCount = $paletteCount;
 
-        $this->keyColors = [];
-        if (array_key_exists(Option::KEY_COLOR, $options)) {
+        $keyColors = [];
+        if (isset($options[Option::KEY_COLOR])) {
             $keyColors = (array)$options[Option::KEY_COLOR];
-            if (count($keyColors) > $this->paletteCount) {
+            if (count($keyColors) > $paletteCount) {
                 throw new OverflowException(
                     'Too many key colors was given',
                     $e->getCode(), $e
@@ -124,8 +123,8 @@ class Reducer
 
             try {
                 foreach ($keyColors as $keyColor) {
-                    $this->table->checkColorCode($keyColor);
-                    $this->keyColors[] = (int)$keyColor;
+                    $table->checkColorCode($keyColor);
+                    $keyColors[] = (int)$keyColor;
                 }
             } catch (\Exception $e) {
                 throw new InvalidArgumentException(
@@ -134,6 +133,7 @@ class Reducer
                 );
             }
         }
+        $this->keyColors = $keyColors;
     }
 
     /**
