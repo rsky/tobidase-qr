@@ -25,6 +25,18 @@ class GenericBuilder extends AbstractBuilder
      */
     protected $bitmap;
 
+    /**
+     * デザインタイプを返す
+     *
+     * @param void
+     *
+     * @return int
+     */
+    public function getType()
+    {
+        return \TobidaseQR\Entity\Design::TYPE_GENERIC;
+    }
+
     public function getHistgram()
     {
         if ($this->histgram) {

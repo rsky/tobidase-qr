@@ -63,6 +63,8 @@ interface BuilderInterface
 
     public function getBitmap();
 
+    public function getDesign();
+
     public function getImage();
 
     public function setImage($image);

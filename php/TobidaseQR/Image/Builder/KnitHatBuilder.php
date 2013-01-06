@@ -3,6 +3,17 @@ namespace TobidaseQR\Image\Builder;
 
 class KnitHatBuilder extends GenericBuilder
 {
+    /**
+     * デザインタイプを返す
+     *
+     * @param void
+     *
+     * @return int
+     */
+    public function getType()
+    {
+        return \TobidaseQR\Entity\Design::TYPE_HAT_KNIT;
+    }
 }
 
 /*

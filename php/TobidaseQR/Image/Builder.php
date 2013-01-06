@@ -108,6 +108,11 @@ class Builder implements BuilderInterface
         return $this->innerBuilder->getBitmap();
     }
 
+    public function getDesign()
+    {
+        return $this->innerBuilder->getDesign();
+    }
+
     private function proxyGetImage($getter)
     {
         if (!method_exists($this->innerBuilder, $getter)) {

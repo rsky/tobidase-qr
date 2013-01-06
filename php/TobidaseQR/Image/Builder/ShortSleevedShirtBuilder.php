@@ -5,6 +5,18 @@ class ShortSleevedShirtBuilder extends CombinedBuilder
 {
     use Element\Shirt;
     use Element\ShortSleeves;
+
+    /**
+     * デザインタイプを返す
+     *
+     * @param void
+     *
+     * @return int
+     */
+    public function getType()
+    {
+        return \TobidaseQR\Entity\Design::TYPE_SHIRT_NO_SLEEEVE;
+    }
 }
 
 /*

@@ -5,7 +5,7 @@ use TobidaseQR\Image\BuilderInterface;
 use TobidaseQR\Common\ColorMapping;
 use TobidaseQR\Common\ColorReduction;
 use TobidaseQR\Common\ImageLoading;
-use Imagick;
+use TobidaseQR\Entity\Design;
 
 abstract class AbstractBuilder implements BuilderInterface
 {
@@ -23,6 +23,25 @@ abstract class AbstractBuilder implements BuilderInterface
         $this->setColorMappingOptions($options);
         $this->setColorReductionOptions($options);
         $this->setImageLoadingOptions($options);
+    }
+
+    /**
+     * デザインタイプを返す
+     *
+     * @param void
+     *
+     * @return int
+     */
+    abstract public function getType();
+
+    public function getDesign()
+    {
+        $design = new Design;
+        $design->type = $this->getType();
+        $design->palette = $this->getPalette();
+        $design->bitmap = $this->getBitmap();
+
+        return $design;
     }
 }
 

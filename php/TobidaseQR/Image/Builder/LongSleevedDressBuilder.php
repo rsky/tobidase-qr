@@ -5,6 +5,18 @@ class LongSleevedDressBuilder extends CombinedBuilder
 {
     use Element\Dress;
     use Element\LongSleeves;
+
+    /**
+     * デザインタイプを返す
+     *
+     * @param void
+     *
+     * @return int
+     */
+    public function getType()
+    {
+        return \TobidaseQR\Entity\Design::TYPE_DRESS_LONG_SLEEEVED;
+    }
 }
 
 /*

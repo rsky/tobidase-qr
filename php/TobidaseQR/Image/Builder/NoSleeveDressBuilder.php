@@ -5,6 +5,18 @@ class NoSleeveDressBuilder extends CombinedBuilder
 {
     use Element\Dress;
     use Element\NoSleeve;
+
+    /**
+     * デザインタイプを返す
+     *
+     * @param void
+     *
+     * @return int
+     */
+    public function getType()
+    {
+        return \TobidaseQR\Entity\Design::TYPE_DRESS_NO_SLEEEVE;
+    }
 }
 
 /*
