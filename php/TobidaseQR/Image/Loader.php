@@ -45,8 +45,6 @@ use Imagick;
  */
 class Loader
 {
-    use ColorMapping;
-
     /**
      * リサイズで使う窓関数の既定値
      */
@@ -85,18 +83,6 @@ class Loader
         $this->blur = (isset($options[Option::RESIZE_BLUR]))
             ? (float)$options[Option::RESIZE_BLUR]
             : self::DEFAULT_RESIZE_BLUR;
-
-        if (isset($options[Option::COLOR_MAPPER])) {
-            $this->setColorMapper($options[Option::COLOR_MAPPER]);
-        } else {
-            $this->setStandardColorMapper();
-        }
-
-        if (isset($options[Option::COLOR_TABLE])) {
-            $this->setColorTable($options[Option::COLOR_TABLE]);
-        } else {
-            $this->setStandardColorTable();
-        }
     }
 
     /**
