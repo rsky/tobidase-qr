@@ -52,6 +52,7 @@ class FalseFloydSteinberg extends ErrorDiffusionDithering
     protected function init($width, $height)
     {
         $errorRow = array_fill(0, $width + 1, [0.0, 0.0, 0.0]);
+        $errorRow[-1] = [0.0, 0.0, 0.0];
         $this->errorTable = array_fill(0, $height + 1, $errorRow);
 
         $offsets = [
