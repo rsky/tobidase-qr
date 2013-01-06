@@ -8,7 +8,7 @@
  * とびだせ どうぶつの森は任天堂(株)の登録商標です
  * QRコードは(株)デンソーウェーブの登録商標です
  *
- * Copyright (c) 2012 Ryusuke SEKIYAMA <rsky0711@gmail.com>,
+ * Copyright (c) 2012-2013 Ryusuke SEKIYAMA <rsky0711@gmail.com>,
  * All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -30,7 +30,7 @@
  * IN THE SOFTWARE.
  *
  * @package     TobidaseQR
- * @copyright   2012 Ryusuke SEKIYAMA <rsky0711@gmail.com>
+ * @copyright   2012-2013 Ryusuke SEKIYAMA <rsky0711@gmail.com>
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  *
  * 色空間の変換には下記URLを参考にさせていただきました

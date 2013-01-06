@@ -7,7 +7,7 @@
  *
  * 「とびだせ どうぶつの森」は任天堂株式会社の登録商標です
  *
- * Copyright (c) 2012 Ryusuke SEKIYAMA <rsky0711@gmail.com>,
+ * Copyright (c) 2012-2013 Ryusuke SEKIYAMA <rsky0711@gmail.com>,
  * All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -29,7 +29,7 @@
  * IN THE SOFTWARE.
  *
  * @package     TobidaseQR
- * @copyright   2012 Ryusuke SEKIYAMA <rsky0711@gmail.com>
+ * @copyright   2012-2013 Ryusuke SEKIYAMA <rsky0711@gmail.com>
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  *
  * カラーパレット情報は下記URLのものを使わせていただきました
