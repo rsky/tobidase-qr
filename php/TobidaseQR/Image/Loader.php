@@ -53,7 +53,7 @@ class Loader
     /**
      * リサイズのぼけ具合の既定値
      */
-    const DEFAULT_RESIZE_BLUR = 0.75;
+    const DEFAULT_RESIZE_BLUR = 1.0;
 
     /**
      * リサイズで使う窓関数
