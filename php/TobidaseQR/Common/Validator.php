@@ -148,18 +148,18 @@ class Validator
     {
         if ($quad) {
             $validTypes = [
-                Design::TYPE_DRESS_LONG_SLEEEVED,
-                Design::TYPE_DRESS_SHORT_SLEEEVED,
-                Design::TYPE_DRESS_NO_SLEEEVE,
-                Design::TYPE_SHIRT_LONG_SLEEEVED,
-                Design::TYPE_SHIRT_SHORT_SLEEEVED,
-                Design::TYPE_SHIRT_NO_SLEEEVE,
+                Design::DRESS_LONG_SLEEEVED,
+                Design::DRESS_SHORT_SLEEEVED,
+                Design::DRESS_NO_SLEEEVE,
+                Design::SHIRT_LONG_SLEEEVED,
+                Design::SHIRT_SHORT_SLEEEVED,
+                Design::SHIRT_NO_SLEEEVE,
             ];
         } else {
             $validTypes = [
-                Design::TYPE_HAT_KNIT,
-                Design::TYPE_HAT_HORNED,
-                Design::TYPE_GENERIC,
+                Design::HAT_KNIT,
+                Design::HAT_HORNED,
+                Design::GENERIC,
             ];
         }
         if (!in_array($type, $validTypes)) {

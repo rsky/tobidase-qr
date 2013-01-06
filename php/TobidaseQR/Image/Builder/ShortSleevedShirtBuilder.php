@@ -15,7 +15,7 @@ class ShortSleevedShirtBuilder extends CombinedBuilder
      */
     public function getType()
     {
-        return \TobidaseQR\Entity\Design::TYPE_SHIRT_NO_SLEEEVE;
+        return \TobidaseQR\Entity\Design::SHIRT_NO_SLEEEVE;
     }
 }
 

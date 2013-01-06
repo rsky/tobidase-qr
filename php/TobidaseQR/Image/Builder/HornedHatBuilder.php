@@ -12,7 +12,7 @@ class HornedHatBuilder extends KnitHatBuilder
      */
     public function getType()
     {
-        return \TobidaseQR\Entity\Design::TYPE_HAT_HORNED;
+        return \TobidaseQR\Entity\Design::HAT_HORNED;
     }
 }
 

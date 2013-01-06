@@ -34,7 +34,7 @@ class GenericBuilder extends AbstractBuilder
      */
     public function getType()
     {
-        return \TobidaseQR\Entity\Design::TYPE_GENERIC;
+        return \TobidaseQR\Entity\Design::GENERIC;
     }
 
     public function getHistgram()

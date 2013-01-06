@@ -15,7 +15,7 @@ class LongSleevedShirtBuilder extends CombinedBuilder
      */
     public function getType()
     {
-        return \TobidaseQR\Entity\Design::TYPE_SHIRT_LONG_SLEEEVED;
+        return \TobidaseQR\Entity\Design::SHIRT_LONG_SLEEEVED;
     }
 }
 

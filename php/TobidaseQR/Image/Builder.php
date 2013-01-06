@@ -58,16 +58,16 @@ class Builder implements BuilderInterface
      * @var array
      */
     private $builderClassMap = [
-        Design::TYPE_DRESS_LONG_SLEEEVED  => 'LongSleevedDress',
-        Design::TYPE_DRESS_SHORT_SLEEEVED => 'ShortSleevedDress',
-        Design::TYPE_DRESS_NO_SLEEEVE     => 'NoSleeveDress',
-        Design::TYPE_SHIRT_LONG_SLEEEVED  => 'LongSleevedShirt',
-        Design::TYPE_SHIRT_SHORT_SLEEEVED => 'ShortSleevedShirt',
-        Design::TYPE_SHIRT_NO_SLEEEVE     => 'NoSleeveShirt',
-        Design::TYPE_HAT_KNIT             => 'KnitHat',
-        Design::TYPE_HAT_HORNED           => 'HornedHat',
-        //Design::TYPE_UNKNOWN => '',
-        Design::TYPE_GENERIC              => 'Generic',
+        Design::DRESS_LONG_SLEEEVED  => 'LongSleevedDress',
+        Design::DRESS_SHORT_SLEEEVED => 'ShortSleevedDress',
+        Design::DRESS_NO_SLEEEVE     => 'NoSleeveDress',
+        Design::SHIRT_LONG_SLEEEVED  => 'LongSleevedShirt',
+        Design::SHIRT_SHORT_SLEEEVED => 'ShortSleevedShirt',
+        Design::SHIRT_NO_SLEEEVE     => 'NoSleeveShirt',
+        Design::HAT_KNIT             => 'KnitHat',
+        Design::HAT_HORNED           => 'HornedHat',
+        //Design::UNKNOWN => '',
+        Design::GENERIC              => 'Generic',
     ];
 
     /**
@@ -79,7 +79,7 @@ class Builder implements BuilderInterface
     {
         $type = (isset($options[Option::DESIGN_TYPE]))
             ? $options[Option::DESIGN_TYPE]
-            : Design::TYPE_GENERIC;
+            : Design::GENERIC;
 
         if (isset($this->builderClassMap[$type])) {
             $builderClass = 'TobidaseQR\\Image\\Builder\\'

@@ -12,7 +12,7 @@ class KnitHatBuilder extends GenericBuilder
      */
     public function getType()
     {
-        return \TobidaseQR\Entity\Design::TYPE_HAT_KNIT;
+        return \TobidaseQR\Entity\Design::HAT_KNIT;
     }
 }
 

@@ -15,7 +15,7 @@ class NoSleeveDressBuilder extends CombinedBuilder
      */
     public function getType()
     {
-        return \TobidaseQR\Entity\Design::TYPE_DRESS_NO_SLEEEVE;
+        return \TobidaseQR\Entity\Design::DRESS_NO_SLEEEVE;
     }
 }
 

@@ -15,7 +15,7 @@ class ShortSleevedDressBuilder extends CombinedBuilder
      */
     public function getType()
     {
-        return \TobidaseQR\Entity\Design::TYPE_DRESS_SHORT_SLEEEVED;
+        return \TobidaseQR\Entity\Design::DRESS_SHORT_SLEEEVED;
     }
 }
 
