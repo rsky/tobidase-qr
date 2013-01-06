@@ -59,10 +59,10 @@ class Builder implements BuilderInterface
      */
     private $builderClassMap = [
         Design::TYPE_DRESS_LONG_SLEEEVED  => 'LongSleevedDress',
-        Design::TYPE_DRESS_SHORT_SLEEEVED => 'NoSleeveDress',
+        Design::TYPE_DRESS_SHORT_SLEEEVED => 'ShortSleevedDress',
         Design::TYPE_DRESS_NO_SLEEEVE     => 'NoSleeveDress',
         Design::TYPE_SHIRT_LONG_SLEEEVED  => 'LongSleevedShirt',
-        Design::TYPE_SHIRT_SHORT_SLEEEVED => 'ShortSleevedDress',
+        Design::TYPE_SHIRT_SHORT_SLEEEVED => 'ShortSleevedShirt',
         Design::TYPE_SHIRT_NO_SLEEEVE     => 'NoSleeveShirt',
         Design::TYPE_HAT_KNIT             => 'KnitHat',
         Design::TYPE_HAT_HORNED           => 'HornedHat',

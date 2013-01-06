@@ -22,7 +22,6 @@ trait Dress
         }
 
         $bitmap = $this->createBitmap($this->frontImage, $table);
-
         for ($y = 0; $y < 32; $y++) {
             for ($x = 0; $x < 32; $x++) {
                 $this->segment1[$y][$x] = $bitmap[$y][$x];
