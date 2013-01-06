@@ -45,7 +45,7 @@ use QRCode;
 /**
  * QRコードエンコーダクラス
  */
-class QREncoder
+class Encoder
 {
     /**
      * マジックナンバー定数
@@ -64,9 +64,8 @@ class QREncoder
      */
     private $defaultOptions = [
         'eclevel'   => QRCode::ECL_M,
-        'masktype'  => 4,
         'format'    => QRCode::FMT_PNG,
-        'magnify'   => 3,
+        'magnify'   => 3, // 型番19で320x320に収まる最大の値
         'separator' => 6,
     ];
 
@@ -200,7 +199,6 @@ class QREncoder
      */
     public function makeBitmap(Design $design)
     {
-        $ipalette = array_flip($design->palette);
         $data = '';
 
         foreach ($design->bitmap as $row) {
@@ -208,11 +206,11 @@ class QREncoder
             $value = 0;
             $colno = 0;
 
-            foreach ($row as $code) {
+            foreach ($row as $index) {
                 if ($colno % 2 === 0) {
-                    $value = $ipalette[$code];
+                    $value = $index;
                 } else {
-                    $pack[] = $value | ($ipalette[$code] << 4);
+                    $pack[] = $value | ($index << 4);
                 }
                 $colno++;
             }
