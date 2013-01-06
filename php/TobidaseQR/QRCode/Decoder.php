@@ -36,6 +36,7 @@
 
 namespace TobidaseQR\QRCode;
 
+use TobidaseQR\Color\Code;
 use TobidaseQR\Entity\Design;
 use TobidaseQR\Entity\HeaderExtra;
 use TobidaseQR\Entity\MyDesign;
@@ -73,11 +74,6 @@ class Decoder
     const OFFSET_VILLAGE_NAME   = 0x42;
     const OFFSET_DESIGN_PALETTE = 0x58;
     const OFFSET_DESIGN_TYPE    = 0x69;
-
-    /**
-     * 不正なカラーコードを示す値
-     */
-    const INVALID_COLOR_CODE = -1;
 
     /**
      * 解析中のマイデザインオブジェクト
@@ -397,8 +393,8 @@ class Decoder
         $palette = [];
 
         foreach ($rawPalette as $offset => $value) {
-            $code = $this->decodeColorCode($value);
-            if ($code === self::INVALID_COLOR_CODE) {
+            $code = Code::decode($value);
+            if ($code === Code::INVALID) {
                 $this->offset = $offset;
                 throw new UnexpectedValueException(sprintf(
                     'Invalid color code 0x%02x', $value
@@ -475,36 +471,6 @@ class Decoder
     private function decodeString($str)
     {
         return rtrim(mb_convert_encoding($str, 'UTF-8', 'UCS-2LE'), "\0");
-    }
-
-    /**
-     * カラーコードをQRコード上の表記から
-     * 0から始まる連番の内部表記に変換する
-     *
-     * @param int $code
-     *
-     * @return int 不正な値のときは-1を返す
-     *
-     * @throws UnexpectedValueException
-     */
-    private function decodeColorCode($code)
-    {
-        $upperBits = ($code & 0xf0) >> 4;
-        $lowerBits = $code & 0xf;
-
-        if ($lowerBits === 0xf) {
-            // モノクロ15色
-            if ($upperBits === 0xf) {
-                return self::INVALID_COLOR_CODE;
-            }
-            return 144 + $upperBits;
-        } else {
-            // カラー9x16色
-            if ($lowerBits > 8) {
-                return self::INVALID_COLOR_CODE;
-            }
-            return 9 * $upperBits + $lowerBits;
-        }
     }
 }
 

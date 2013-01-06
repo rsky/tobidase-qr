@@ -36,6 +36,7 @@
 
 namespace TobidaseQR\QRCode;
 
+use TobidaseQR\Color\Code;
 use TobidaseQR\Entity\Design;
 use TobidaseQR\Entity\MyDesign;
 use TobidaseQR\Entity\Player;
@@ -172,7 +173,7 @@ class Encoder
         ];
 
         foreach ($design->palette as $index => $code) {
-            $colors[$index] = $this->encodeColorCode($code);
+            $colors[$index] = Code::encode($code);
         }
 
         // パレットに続く8bit値
@@ -231,25 +232,6 @@ class Encoder
     private function encodeString($str)
     {
         return mb_convert_encoding($str, 'UCS-2LE', 'UTF-8');
-    }
-
-    /**
-     * カラーコードを0から始まる連番の内部表記から
-     * QRコード用の表記に変換する
-     *
-     * @param int $code
-     *
-     * @return int
-     */
-    private function encodeColorCode($code)
-    {
-        if ($code < 144) {
-            // カラー9x16色
-            return ((int)($code / 9) << 4) | ($code % 9);
-        } else {
-            // モノクロ15色
-            return (($code - 144) << 4) | 0xf;
-        }
     }
 
     /**

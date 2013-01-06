@@ -109,6 +109,25 @@ $palletB = [
   82, 66, 49, 33, 0
 ];
 
+$htmlColors = [
+    'white'   => [0xff, 0xff, 0xff],
+    'silver'  => [0xc0, 0xc0, 0xc0],
+    'gray'    => [0x80, 0x80, 0x80],
+    'black'   => [0x00, 0x00, 0x00],
+    'red'     => [0xff, 0x00, 0x00],
+    'maroon'  => [0x80, 0x00, 0x00],
+    'yellow'  => [0xff, 0xff, 0x00],
+    'olive'   => [0x80, 0x80, 0x00],
+    'lime'    => [0x00, 0xff, 0x00],
+    'green'   => [0x00, 0x80, 0x00],
+    'aqua'    => [0x00, 0xff, 0xff],
+    'teal'    => [0x00, 0x80, 0x80],
+    'blue'    => [0x00, 0x00, 0xff],
+    'navy'    => [0x00, 0x00, 0x80],
+    'fuchsia' => [0xff, 0x00, 0xff],
+    'purple'  => [0x80, 0x00, 0x80],
+];
+
 function makeRgbColorTable(array $palletR, array $palletG, array $palletB)
 {
     $table = [];
@@ -198,6 +217,40 @@ function makeLabColorTablePhpCode(array $table, array $options = [])
     );
 }
 
+function makeColorPalettePhpCode()
+{
+    global $htmlColors;
+
+    $code = '';
+
+    // カラー9x16色
+    for ($u = 0; $u < 16; $u++) {
+        for ($l = 0; $l < 9; $l++) {
+            $code .= sprintf("const P_%X%X = %3d;\n", $u, $l, 9 * $u + $l);
+        }
+    }
+
+    // モノクロ15色
+    for ($k = 0; $k < 15; $k++) {
+        $code .= sprintf("const P_%XF = %3d;\n", $k, $k + 144);
+    }
+
+    // HTML 4.01カラー
+    if (class_exists('TobidaseQR\\Color\\Table')) {
+        $table = new Color\Table;
+        foreach ($htmlColors as $name => $rgb) {
+            list($r, $g, $b) = $rgb;
+            $code .= sprintf(
+                "const %-7s = %3d;\n",
+                strtoupper($name),
+                $table->nearestColorCodeByRgb($r, $g, $b)
+            );
+        }
+    }
+
+    return $code;
+}
+
 function codegen()
 {
     global $palletR, $palletG, $palletB;
@@ -208,9 +261,13 @@ function codegen()
     echo "# PHP\n";
     echo makeRgbColorTablePhpCode($rgbColorTable, ['breakCount' => 4]);
     echo makeLabColorTablePhpCode($labColorTable, ['breakCount' => 2]);
+    echo makeColorPalettePhpCode();
 }
 
 if (realpath($_SERVER['SCRIPT_NAME']) === __FILE__) {
+    chdir(__DIR__);
+    set_include_path(__DIR__);
+    spl_autoload_register();
     codegen();
 }
 
