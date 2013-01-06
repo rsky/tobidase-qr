@@ -123,22 +123,6 @@ class Loader
     }
 
     /**
-     * 画像を読み込み、カラーテーブルの色を割り当てたビットマップを返す
-     *
-     * @param mixed $source Imagickオブジェクトもしくは画像ファイルのパス
-     * @param int $width
-     * @param int $height
-     *
-     * @return int[][]
-     */
-    public function loadImageAsBitmap($source, $width, $height)
-    {
-        $image = $this->loadImage($bitmap, $width, $height);
-
-        return $this->mapper->map($image, $this->table);
-    }
-
-    /**
      * 画像の色空間をRGBにする
      *
      * @param Imagick $image

@@ -39,6 +39,7 @@ namespace TobidaseQR\Common;
 use TobidaseQR\Color\MapperInterface;
 use TobidaseQR\Color\Mapper\SimpleMapper;
 use TobidaseQR\Color\Table;
+use Imagick;
 
 /**
  * 色の割り当て機能を持つトレイト
@@ -50,14 +51,14 @@ trait ColorMapping
      *
      * @var TobidaseQR\Color\MapperInterface
      */
-    protected $mapper;
+    private $mapper;
 
     /**
      * カラーテーブルオブジェクト
      *
      * @var TobidaseQR\Color\Table
      */
-    protected $table;
+    private $table;
 
     /**
      * 連想配列のオプションからオブジェクトをセットする
@@ -151,6 +152,48 @@ trait ColorMapping
     public function setStandardColorTable()
     {
         $this->table = new Table;
+    }
+
+    /**
+     * 有効なカラーコードのリストを返す
+     *
+     * @param void
+     *
+     * @return int[]
+     */
+    protected function getAllColorCodes()
+    {
+        return array_keys($this->table->getRgbColorTable());
+    }
+
+    /**
+     * Imagickオブジェクトから近似色のヒストグラムを作成する
+     *
+     * @param Imagick $image 色空間は COLORSPACE_RGB or COLORSPACE_SRGB
+     * @param TobidaseQR\Color\MapperInterface $mapper
+     *
+     * @return array
+     *
+     * @see TobidaseQR\Color\Table::createHistgram()
+     */
+    protected function createHistgram(Imagick $image, MapperInterface $mapper = null)
+    {
+        return $this->table->createHistgram($image, $mapper ?: $this->mapper);
+    }
+
+    /**
+     * 画像の各ピクセルにカラーコードを割り当てる
+     *
+     * @param Imagick $image
+     * @param TobidaseQR\Color\Table $table
+     *
+     * @return int[][] カラーコードの2次元配列
+     *
+     * @see TobidaseQR\Color\MapperInterface::map()
+     */
+    protected function createBitmap(Imagick $image, Table $table = null)
+    {
+        return $this->mapper->map($image, $table ?: $this->table);
     }
 }
 

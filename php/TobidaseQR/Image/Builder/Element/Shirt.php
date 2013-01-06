@@ -7,12 +7,12 @@ trait Shirt
 {
     protected function loadFrontImage($image)
     {
-        $this->frontImage = $this->loader->loadImage($image, 32, 32);
+        $this->frontImage = $this->loadImage($image, 32, 32);
     }
 
     protected function loadBackImage($image)
     {
-        $this->backImage = $this->loader->loadImage($image, 32, 32);
+        $this->backImage = $this->loadImage($image, 32, 32);
     }
 
     protected function locateFrontImage(Table $table)
@@ -21,7 +21,7 @@ trait Shirt
             return;
         }
 
-        $bitmap = $this->mapper->map($this->frontImage, $table);
+        $bitmap = $this->createBitmap($this->frontImage, $table);
         for ($y = 0; $y < 32; $y++) {
             for ($x = 0; $x < 32; $x++) {
                 $this->segment1[$y][$x] = $bitmap[$y][$x];
@@ -35,7 +35,7 @@ trait Shirt
             return;
         }
 
-        $bitmap = $this->mapper->map($this->backImage, $table);
+        $bitmap = $this->createBitmap($this->backImage, $table);
         for ($y = 0; $y < 32; $y++) {
             for ($x = 0; $x < 32; $x++) {
                 $this->segment2[$y][$x] = $bitmap[$y][$x];

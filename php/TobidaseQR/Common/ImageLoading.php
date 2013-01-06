@@ -48,7 +48,7 @@ trait ImageLoading
      *
      * @var TobidaseQR\Image\Loader
      */
-    protected $loader;
+    private $loader;
 
     /**
      * 連想配列のオプションからオブジェクトをセットする
@@ -100,6 +100,22 @@ trait ImageLoading
     public function setStandardImageLoader()
     {
         $this->loader = new Loader;
+    }
+
+    /**
+     * 標準の画像ローダーをセットする
+     *
+     * @param mixed $image
+     * @param int $width
+     * @param int $height
+     *
+     * @return Imagick
+     *
+     * @see TobidaseQR\Image\Loader::loadImage()
+     */
+    protected function loadImage($image, $width, $height)
+    {
+        return $this->loader->loadImage($image, $width, $height);
     }
 }
 

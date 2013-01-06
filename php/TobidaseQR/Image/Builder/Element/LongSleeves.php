@@ -7,12 +7,12 @@ trait LongSleeves
 {
     protected function loadLeftImage($image)
     {
-        $this->leftImage = $this->loader->loadImage($image, 16, 32);
+        $this->leftImage = $this->loadImage($image, 16, 32);
     }
 
     protected function loadRightImage($image)
     {
-        $this->rightImage = $this->loader->loadImage($image, 16, 32);
+        $this->rightImage = $this->loadImage($image, 16, 32);
     }
 
     protected function locateLeftImage(Table $table)
@@ -21,7 +21,7 @@ trait LongSleeves
             return;
         }
 
-        $bitmap = $this->mapper->map($this->leftImage, $table);
+        $bitmap = $this->createBitmap($this->leftImage, $table);
         for ($y = 0; $y < 32; $y++) {
             for ($x = 0; $x < 16; $x++) {
                 $this->segment3[31 - $x][$y] = $bitmap[$y][$x];
@@ -35,7 +35,7 @@ trait LongSleeves
             return;
         }
 
-        $bitmap = $this->mapper->map($this->rightImage, $table);
+        $bitmap = $this->createBitmap($this->rightImage, $table);
         for ($y = 0; $y < 32; $y++) {
             for ($x = 0; $x < 16; $x++) {
                 $this->segment3[15 - $x][$y] = $bitmap[$y][$x];

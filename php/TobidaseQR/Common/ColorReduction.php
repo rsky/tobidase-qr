@@ -48,7 +48,7 @@ trait ColorReduction
      *
      * @var TobidaseQR\Color\Reducer
      */
-    protected $reducer;
+    private $reducer;
 
     /**
      * 減色済カラーテーブル

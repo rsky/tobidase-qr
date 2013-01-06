@@ -86,7 +86,7 @@ abstract class CombinedBuilder extends AbstractBuilder
 
         $totalCount = 0;
         $globalHistgram = [];
-        foreach (array_keys($this->table->getRgbColorTable()) as $code) {
+        foreach ($this->getAllColorCodes() as $code) {
             $globalHistgram[$code] = 0;
         }
 
@@ -157,9 +157,7 @@ abstract class CombinedBuilder extends AbstractBuilder
     public function setFrontImage($image)
     {
         $this->loadFrontImage($image);
-        $this->frontHistgram = $this->table->createHistgram(
-            $this->frontImage, $this->mapper
-        );
+        $this->frontHistgram = $this->createHistgram($this->frontImage);
         $this->histgram = null;
         $this->palette = null;
     }
@@ -167,9 +165,7 @@ abstract class CombinedBuilder extends AbstractBuilder
     public function setBackImage($image)
     {
         $this->loadBackImage($image);
-        $this->backHistgram = $this->table->createHistgram(
-            $this->backImage, $this->mapper
-        );
+        $this->backHistgram = $this->createHistgram($this->backImage);
         $this->histgram = null;
         $this->palette = null;
     }
@@ -177,9 +173,7 @@ abstract class CombinedBuilder extends AbstractBuilder
     public function setRightImage($image)
     {
         $this->loadRightImage($image);
-        $this->rightHistgram = $this->table->createHistgram(
-            $this->rightImage, $this->mapper
-        );
+        $this->rightHistgram = $this->createHistgram($this->rightImage);
         $this->histgram = null;
         $this->palette = null;
     }
@@ -187,9 +181,7 @@ abstract class CombinedBuilder extends AbstractBuilder
     public function setLeftImage($image)
     {
         $this->loadLeftImage($image);
-        $this->leftHistgram = $this->table->createHistgram(
-            $this->leftImage, $this->mapper
-        );
+        $this->leftHistgram = $this->createHistgram($this->leftImage);
         $this->histgram = null;
         $this->palette = null;
     }

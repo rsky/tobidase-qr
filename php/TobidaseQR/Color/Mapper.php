@@ -72,7 +72,6 @@ class Mapper implements MapperInterface
      *
      * @param Imagick $image
      * @param TobidaseQR\Color\Table $table
-     * @param array $options
      *
      * @return int[][] カラーコードの2次元配列
      */

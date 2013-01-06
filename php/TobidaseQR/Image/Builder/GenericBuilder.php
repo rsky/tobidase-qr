@@ -33,9 +33,7 @@ class GenericBuilder extends AbstractBuilder
             return null;
         }
 
-        $this->histgram = $this->table->createHistgram(
-            $this->image, $this->mapper
-        );
+        $this->histgram = $this->createHistgram($this->image);
 
         return $this->histgram;
     }
@@ -64,7 +62,7 @@ class GenericBuilder extends AbstractBuilder
 
         $colors = $this->reduceColor($this->getHistgram());
         $table = new Table(array_values($colors));
-        $this->bitmap = $this->mapper->map($this->image, $table);
+        $this->bitmap = $this->createBitmap($this->image, $table);
 
         return $this->bitmap;
     }
@@ -76,7 +74,7 @@ class GenericBuilder extends AbstractBuilder
 
     public function setImage($image)
     {
-        $this->image = $this->loader->loadImage($image, 32, 32);
+        $this->image = $this->loadImage($image, 32, 32);
         $this->histgram = null;
         $this->palette = null;
         $this->bitmap = null;
