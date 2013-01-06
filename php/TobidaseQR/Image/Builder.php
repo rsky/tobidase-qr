@@ -38,6 +38,7 @@ namespace TobidaseQR\Image;
 
 use TobidaseQR\Color\Mapper;
 use TobidaseQR\Common\Option;
+use TobidaseQR\Entity\Design;
 use InvalidArgumentException;
 use BadMethodCallException;
 
@@ -74,10 +75,10 @@ class Builder implements BuilderInterface
      *
      * @param array $options
      */
-    public function __construt(array $options = [])
+    public function __construct(array $options = [])
     {
-        $type = (isset($options[Option::MY_DESIGN_TYPE]))
-            ? $options[Option::MY_DESIGN_TYPE]
+        $type = (isset($options[Option::DESIGN_TYPE]))
+            ? $options[Option::DESIGN_TYPE]
             : Design::TYPE_GENERIC;
 
         if (isset($this->builderClassMap[$type])) {

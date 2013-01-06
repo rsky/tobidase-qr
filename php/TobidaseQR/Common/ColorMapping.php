@@ -77,7 +77,7 @@ trait ColorMapping
         if (isset($options[Option::COLOR_TABLE])) {
             $this->setColorTable($options[Option::COLOR_TABLE]);
         } else {
-            $this->setStandardColorReducer();
+            $this->setStandardColorTable();
         }
     }
 

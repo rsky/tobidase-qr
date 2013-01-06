@@ -70,9 +70,15 @@ class DitheringMapper extends AbstractMapper
     {
         parent::__construct($options);
 
-        $algorithm = (isset($options[Option::DITHERING_ALGORITHM]))
-            ? $options[Option::DITHERING_ALGORITHM]
-            : self::DEFAULT_ALGORITHM;
+        if (isset($options[Option::DITHERING])) {
+            if ($options[Option::DITHERING] === true) {
+                $algorithm = self::DEFAULT_ALGORITHM;
+            } else {
+                $algorithm = $options[Option::DITHERING];
+            }
+        } else {
+            $algorithm = self::DEFAULT_ALGORITHM;
+        }
 
         if (is_object($algorithm) && $algorithm instanceof DitheringAlgorithm) {
             $this->dithering = $algorithm;

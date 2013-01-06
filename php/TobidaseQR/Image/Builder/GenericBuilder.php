@@ -1,6 +1,8 @@
 <?php
 namespace TobidaseQR\Image\Builder;
 
+use TobidaseQR\Color\Table;
+
 class GenericBuilder extends AbstractBuilder
 {
     /**
@@ -46,9 +48,8 @@ class GenericBuilder extends AbstractBuilder
             return null;
         }
 
-        $this->palette = array_keys(
-            $this->reduceColor($this->getHistgram())->getRgbColorTable()
-        );
+        $colors = $this->reduceColor($this->getHistgram());
+        $this->palette = array_keys($colors);
 
         return $this->palette;
     }
@@ -61,9 +62,9 @@ class GenericBuilder extends AbstractBuilder
             return null;
         }
 
-        $this->bitmap = $this->mapper->map(
-            $this->image, $this->reduceColor($this->getHistgram())
-        );
+        $colors = $this->reduceColor($this->getHistgram());
+        $table = new Table(array_values($colors));
+        $this->bitmap = $this->mapper->map($this->image, $table);
 
         return $this->bitmap;
     }
@@ -75,7 +76,7 @@ class GenericBuilder extends AbstractBuilder
 
     public function setImage($image)
     {
-        $this->image = $this->loader->load($image, 32, 32);
+        $this->image = $this->loader->loadImage($image, 32, 32);
         $this->histgram = null;
         $this->palette = null;
         $this->bitmap = null;

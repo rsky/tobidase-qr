@@ -176,6 +176,21 @@ class Renderer
     {
         return $this->renderDesign($myDesign->design, $scale);
     }
+
+    /**
+     * イメージビルダーオブジェクトをImagickオブジェクトに描画する
+     *
+     * @param TobidaseQR\Image\BuilderInterface $builder
+     * @param int $scale
+     *
+     * @return Imagick
+     */
+    public function renderBuilder(BuilderInterface $builder, $scale = 1)
+    {
+        return $this->renderBitmap(
+            $builder->getBitmap(), $builder->getPalette(), $scale
+        );
+    }
 }
 
 /*

@@ -48,12 +48,11 @@ class Option
     const PALETTE_COUNT = 'paletteCount';
     const KEY_COLOR     = 'keyColor';
     const DITHERING     = 'dithering';
-    const DITHERING_ALGORITHM   = 'ditheringAlgorithm';
     const RESIZE_FILTER = 'resizeFilter';
     const RESIZE_BLUR   = 'resizeBlur';
-    const MY_DESIGN_TYPE    = 'myDesignType';
-    const DIFFUSION_WEIGHT  = 'diffusionWeight';
-    const WEAVING_SCAN      = 'weavingScan';
+    const DESIGN_TYPE   = 'designType';
+    const WEAVING_SCAN  = 'weavingScan';
+    const DIFFUSION_WEIGHT = 'diffusionWeight';
 }
 
 /*

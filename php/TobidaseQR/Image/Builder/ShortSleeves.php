@@ -1,16 +1,18 @@
 <?php
 namespace TobidaseQR\Image\Builder;
 
+use TobidaseQR\Color\Table;
+
 trait ShortSleeves
 {
     protected function loadLeftImage($image)
     {
-        $this->leftImage = $this->loader->load($image, 16, 16);
+        $this->leftImage = $this->loader->loadImage($image, 16, 16);
     }
 
     protected function loadRightImage($image)
     {
-        $this->rightImage = $this->loader->load($image, 16, 16);
+        $this->rightImage = $this->loader->loadImage($image, 16, 16);
     }
 
     protected function locateLeftImage(Table $table)

@@ -1,16 +1,18 @@
 <?php
 namespace TobidaseQR\Image\Builder;
 
+use TobidaseQR\Color\Table;
+
 trait Shirt
 {
     protected function loadFrontImage($image)
     {
-        $this->frontImage = $this->loader->load($image, 32, 32);
+        $this->frontImage = $this->loader->loadImage($image, 32, 32);
     }
 
     protected function loadBackImage($image)
     {
-        $this->backImage = $this->loader->load($image, 32, 32);
+        $this->backImage = $this->loader->loadImage($image, 32, 32);
     }
 
     protected function locateFrontImage(Table $table)

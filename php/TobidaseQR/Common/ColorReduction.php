@@ -55,7 +55,7 @@ trait ColorReduction
      *
      * @var TobidaseQR\Color\Table
      */
-    protected $reducedTable;
+    private $reducedTable;
 
     /**
      * 最後に与えられたヒストグラムを正規化したもののJSON値
@@ -118,11 +118,11 @@ trait ColorReduction
     }
 
     /**
-     * 減色済テーブルを得る
+     * ヒストグラムを元に減色を行う
      *
      * @param array $histgram
      *
-     * @return TobidaseQR\Color\Table
+     * @return array
      */
     protected function reduceColor(array $histgram)
     {
@@ -130,13 +130,13 @@ trait ColorReduction
         ksort($histgram, SORT_NUMERIC);
         $json = json_encode($histgram, JSON_FORCE_OBJECT);
         if ($this->reducedTable && $json === $this->histgramJson) {
-            return $this->reducedTable;
+            return $this->reducedTable->getRgbColorTable();
         }
 
         $this->reducedTable = $this->reducer->reduceColor($histgram);
         $this->histgramJson = $json;
 
-        return $this->reducedTable;
+        return $this->reducedTable->getRgbColorTable();
     }
 }
 

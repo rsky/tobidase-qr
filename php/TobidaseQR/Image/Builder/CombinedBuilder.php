@@ -68,9 +68,9 @@ abstract class CombinedBuilder extends AbstractBuilder
      */
     protected $segment4;
 
-    public function __construct(Loader $loader, array $options = [])
+    public function __construct(array $options = [])
     {
-        parent::__construct($loader, $options);
+        parent::__construct($options);
 
         $this->segment1 = array_fill(0, 32, array_fill(0, 32, 0));
         $this->segment2 = array_fill(0, 32, array_fill(0, 32, 0));
@@ -86,7 +86,7 @@ abstract class CombinedBuilder extends AbstractBuilder
 
         $totalCount = 0;
         $globalHistgram = [];
-        foreach (array_keys($this->table->getRgbColorTable) as $code) {
+        foreach (array_keys($this->table->getRgbColorTable()) as $code) {
             $globalHistgram[$code] = 0;
         }
 
@@ -96,7 +96,6 @@ abstract class CombinedBuilder extends AbstractBuilder
             $this->rightHistgram,
             $this->leftHistgram,
         ];
-
         foreach ($histgrams as $histgram) {
             if ($histgram) {
                 foreach ($histgram as $code => $count) {
@@ -126,9 +125,7 @@ abstract class CombinedBuilder extends AbstractBuilder
             return null;
         }
 
-        $this->palette = array_keys(
-            $this->reduceColor($histgram)->getRgbColorTable()
-        );
+        $this->palette = array_keys($this->reduceColor($histgram));
 
         return $this->palette;
     }
@@ -140,11 +137,12 @@ abstract class CombinedBuilder extends AbstractBuilder
             return null;
         }
 
-        $reducedTable = $this->reduceColor($histgram);
-        $this->locateFrontImage($reducedTable);
-        $this->locateBackImage($reducedTable);
-        $this->locateRightImage($reducedTable);
-        $this->locateLeftImage($reducedTable);
+        $colors = $this->reduceColor($this->getHistgram());
+        $table = new Table(array_values($colors));
+        $this->locateFrontImage($table);
+        $this->locateBackImage($table);
+        $this->locateRightImage($table);
+        $this->locateLeftImage($table);
 
         return array_merge(
             $this->segment1, $this->segment2, $this->segment3, $this->segment4

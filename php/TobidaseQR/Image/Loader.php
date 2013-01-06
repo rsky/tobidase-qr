@@ -168,42 +168,44 @@ class Loader
     {
         $srcWidth = $image->getImageWidth();
         $srcHeight = $image->getImageHeight();
+        $srcAspectRatio = $srcWidth / $srcHeight;
+        $dstAspectRatio = $width / $height;
 
-        // 小さい画像を引き伸ばす
-        if ($srcWidth < $width || $srcHeight < $height) {
-            if ($srcWidth / $srcHeight > $width / $height) {
-                // 横長画像→縦を合わせ、横ははみ出す
-                $tmpWidth = round($height * $srcWidth / $srcHeight);
-                $tmpHeight = $height;
-                $ratio = $tmpHeight / $srcHeight;
-            } else {
-                // 縦長画像→横を合わせ、縦ははみ出す
-                $tmpHeight = round($width * $srcHeight / $srcWidth);
-                $tmpWidth = $width;
-                $ratio = $tmpWidth / $srcWidth;
-            }
+        if ($srcAspectRatio > $dstAspectRatio) {
+            // 横長画像→縦を合わせ、横ははみ出す
+            $dstWidth = round($height * $srcWidth / $srcHeight);
+            $dstWidth = max(1, (int)$dstWidth);
+            $dstHeight = $height;
+            $scale = $height / $srcHeight;
+        } elseif ($srcAspectRatio < $dstAspectRatio) {
+            // 縦長画像→横を合わせ、縦ははみ出す
+            $dstHeight = round($width * $srcHeight / $srcWidth);
+            $dstHeight = max(1, (int)$dstHeight);
+            $dstWidth = $width;
+            $scale = $width / $srcWidth;
+        } else {
+            $dstWidth = $width;
+            $dstHeight = $height;
+            $scale = $width / $srcWidth;
+        }
 
-            if (0.875 < $ratio && $ratio < 1.125) {
-                $image->adaptiveResizeImage($tmpWidth, $tmpHeight, true);
-            } else {
-                $image->resizeImage(
-                    $tmpWidth, $tmpHeight, $this->filter, $this->blur, true
-                );
-            }
-
-            $srcWidth = $tmpWidth;
-            $srcHeight = $tmpHeight;
+        if (0.875 < $scale && $scale < 1.125) {
+            $image->adaptiveResizeImage($dstWidth, $dstHeight, true);
+        } else {
+            $image->resizeImage(
+                $dstWidth, $dstHeight, $this->filter, $this->blur, true
+            );
         }
 
         // はみ出る部分をカットする
-        if ($srcWidth > $width) {
+        if ($dstWidth > $width) {
             $image->cropImage(
-                $width, $srcHeight, floor(($srcWidth - $width) / 2), 0
+                $width, $dstHeight, floor(($dstWidth - $width) / 2), 0
             );
         }
-        if ($srcHeight > $height) {
+        if ($dstHeight > $height) {
             $image->cropImage(
-                $srcWidth, $height, 0, floor(($srcHeight - $height) / 2)
+                $dstWidth, $height, 0, floor(($dstHeight - $height) / 2)
             );
         }
     }
