@@ -32,7 +32,7 @@ INSTALL
 ### 1. Build the ZXing C++ static library
 
 1. `unzip ZXing-x.y.zip`
-2. `cd zxing-2.1/cpp`
+2. `cd zxing-x.y/cpp`
 3. `scons lib DEBUG=0`
 
 ### 2. Build and install this extension
