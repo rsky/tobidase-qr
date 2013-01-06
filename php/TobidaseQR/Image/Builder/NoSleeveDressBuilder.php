@@ -3,8 +3,8 @@ namespace TobidaseQR\Image\Builder;
 
 class NoSleeveDressBuilder extends CombinedBuilder
 {
-    use Dress;
-    use NoSleeve;
+    use Element\Dress;
+    use Element\NoSleeve;
 }
 
 /*

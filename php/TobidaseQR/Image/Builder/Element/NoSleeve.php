@@ -1,5 +1,5 @@
 <?php
-namespace TobidaseQR\Image\Builder;
+namespace TobidaseQR\Image\Builder\Element;
 
 use DomainException;
 
